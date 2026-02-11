@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     OnboardingData(
       icon: Icons.local_laundry_service,
       title: 'Selamat Datang!',
-      subtitle: 'Laundry JagoFlutter',
+      subtitle: 'Laundry ',
       description:
           'Aplikasi kasir laundry modern untuk UMKM Indonesia.\nKelola bisnis laundry Anda dengan mudah, cepat, dan profesional.',
       gradient: const LinearGradient(
@@ -97,7 +97,6 @@ class _OnboardingScreenState extends State<OnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(

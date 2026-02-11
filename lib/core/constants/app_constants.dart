@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   // App Info
-  static const String appName = 'Laundry JagoFlutter';
+  static const String appName = 'Laundry ';
   static const String appVersion = '1.0.0';
   static const String appDescription = 'Aplikasi Kasir Laundry UMKM Indonesia - Full Offline, Jalan Tanpa Internet!';
 
@@ -54,7 +54,7 @@ class AppConstants {
   static const String keyLastInvoiceNumber = 'last_invoice_number';
 
   // Default Laundry Info
-  static const String defaultLaundryName = 'Laundry JagoFlutter';
+  static const String defaultLaundryName = 'Laundry ';
   static const String defaultLaundryAddress = 'Jalan Palagan Jago Flutter, Sleman, DIY';
   static const String defaultLaundryPhone = '6285640899224';
   static const String defaultBaseUrl = 'http://localhost:8080';

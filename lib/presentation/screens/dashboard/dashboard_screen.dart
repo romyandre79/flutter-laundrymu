@@ -13,7 +13,7 @@ import 'package:flutter_laundry_offline_app/logic/cubits/dashboard/dashboard_cub
 import 'package:flutter_laundry_offline_app/logic/cubits/dashboard/dashboard_state.dart';
 import 'package:flutter_laundry_offline_app/logic/cubits/order/order_cubit.dart';
 import 'package:flutter_laundry_offline_app/logic/cubits/service/service_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/printer/printer_cubit.dart';
+
 import 'package:flutter_laundry_offline_app/logic/cubits/sync/sync_cubit.dart';
 import 'package:flutter_laundry_offline_app/presentation/screens/orders/order_form_screen.dart';
 import 'package:flutter_laundry_offline_app/presentation/screens/orders/order_detail_screen.dart';
@@ -259,20 +259,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     builder: (context, syncState) {
                       IconData icon;
                       Color color;
-                      String statusText;
 
                       if (syncState is SyncOnline) {
                         icon = Icons.wifi;
                         color = Colors.white;
-                        statusText = "Online";
                       } else if (syncState is Syncing) {
                         icon = Icons.sync;
                         color = Colors.yellow;
-                         statusText = "Syncing...";
                       } else {
                         icon = Icons.wifi_off;
                         color = Colors.white.withValues(alpha: 0.6);
-                        statusText = "Offline";
                       }
 
                       return GestureDetector(
@@ -496,12 +492,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => BlocProvider(
-                        create: (_) => PrinterCubit(),
-                        child: const PrinterSettingsScreen(),
-                      ),
+                      builder: (_) => const PrinterSettingsScreen(),
                     ),
                   );
+
                 },
               ),
             ),

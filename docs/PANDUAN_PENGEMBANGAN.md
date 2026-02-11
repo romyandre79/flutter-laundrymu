@@ -1,6 +1,6 @@
-# Panduan Pengembangan Aplikasi Laundry JagoFlutter
+# Panduan Pengembangan Aplikasi Laundry 
 
-Dokumentasi ini menjelaskan cara mengkustomisasi dan mengembangkan aplikasi Laundry JagoFlutter untuk kebutuhan bisnis Anda.
+Dokumentasi ini menjelaskan cara mengkustomisasi dan mengembangkan aplikasi Laundry  untuk kebutuhan bisnis Anda.
 
 ---
 
@@ -502,7 +502,7 @@ flutter run
 
 Format: `com.company.appname`
 
-Contoh: `com.jagoflutter.laundryoffline`
+Contoh: `com.kreatif.laundrymu`
 
 **Aturan:**
 - Hanya huruf kecil, angka, dan titik
@@ -867,5 +867,5 @@ build/app/outputs/flutter-apk/app-arm64-v8a-release.apk  (jika split)
 
 <p align="center">
   <strong>Happy Coding!</strong><br/>
-  Made with love by <a href="https://jagoflutter.com">JagoFlutter.com</a>
+  Made with love by <a href="https://.com">.com</a>
 </p>

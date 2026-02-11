@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 import 'package:flutter_laundry_offline_app/core/constants/app_constants.dart';
 import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
 import 'package:flutter_laundry_offline_app/data/models/user.dart';
@@ -24,7 +24,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late SettingsCubit _settingsCubit;
+
 
   @override
   void initState() {
@@ -505,7 +505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context: context,
                                 icon: Icons.print,
                                 title: 'Pengaturan Printer',
-                                subtitle: 'Coming Soon',
+                                subtitle: 'Kelola Printer Bluetooth',
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -567,7 +567,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               // _buildSettingTile(
                               //   context: context,
                               //   icon: Icons.school,
-                              //   title: 'JagoFlutter.com',
+                              //   title: '.com',
                               //   subtitle: 'Belajar Flutter dari NOL hingga PRO',
                               //   showArrow: false,
                               //   onTap: null,
@@ -576,10 +576,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
 
                           // Mentor Section
-                          _buildSection(
-                            title: 'Creator',
-                            children: [_buildMentorCard()],
-                          ),
+                          // _buildSection(
+                          //   title: 'Creator',
+                          //   children: [_buildMentorCard()],
+                          // ),
 
                           // Logout Button
                           Padding(
@@ -849,289 +849,5 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildMentorCard() {
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        children: [
-          // Profile Section
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Avatar
-              Container(
-                width: 70,
-                height: 70,
-                decoration: BoxDecoration(
-                  gradient: AppThemeColors.primaryGradient,
-                  borderRadius: AppRadius.fullRadius,
-                  boxShadow: AppShadows.purple,
-                ),
-                child: const Icon(Icons.person, color: Colors.white, size: 40),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              // Info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Saiful Bahri',
-                      style: AppTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppThemeColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      '@codewithbahri',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppThemeColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      'Founder JagoFlutter.com & Co-Founder CTO PT HINT',
-                      style: AppTypography.bodySmall.copyWith(
-                        color: AppThemeColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Bio
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppThemeColors.primarySurface,
-              borderRadius: AppRadius.mdRadius,
-            ),
-            child: Text(
-              'Lulusan Teknik Informatika dengan 15+ tahun pengalaman di industri teknologi dari startup hingga unicorn.',
-              style: AppTypography.bodySmall.copyWith(
-                color: AppThemeColors.textSecondary,
-                height: 1.5,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Experience Highlights
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppThemeColors.background,
-              borderRadius: AppRadius.mdRadius,
-              border: Border.all(color: AppThemeColors.divider),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: AppThemeColors.primarySurface,
-                        borderRadius: AppRadius.smRadius,
-                      ),
-                      child: const Icon(
-                        Icons.work_history,
-                        color: AppThemeColors.primary,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      'Pengalaman Profesional',
-                      style: AppTypography.labelMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppThemeColors.textPrimary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.md),
-                _buildExperienceItem(
-                  '2024 - Sekarang',
-                  'Co-Founder & CTO',
-                  'PT HINT',
-                ),
-                _buildExperienceItem(
-                  '2023 - Sekarang',
-                  'Founder',
-                  'JagoFlutter.com',
-                ),
-                _buildExperienceItem('2020 - 2023', 'Tech Lead', 'Woo-hoo.org'),
-                _buildExperienceItem(
-                  '2019 - 2020',
-                  'Tech Lead',
-                  'Sampingan.id',
-                ),
-                _buildExperienceItem(
-                  '2018 - 2019',
-                  'VP Engineering',
-                  'PT Motoran Indonesia',
-                ),
-                _buildExperienceItem(
-                  '2015 - 2017',
-                  'Tech Lead',
-                  'Go-Jek (GOTIX)',
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // WhatsApp Contact
-          GestureDetector(
-            onTap: () => _launchWhatsApp(),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF25D366), Color(0xFF128C7E)],
-                ),
-                borderRadius: AppRadius.mdRadius,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.chat, color: Colors.white, size: 20),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    'Hubungi via WhatsApp',
-                    style: AppTypography.labelMedium.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-
-          // Social Links
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildSocialLink(
-                Icons.link,
-                'LinkedIn',
-                'https://linkedin.com/in/bahrie',
-              ),
-              _buildSocialLink(
-                Icons.code,
-                'GitHub',
-                'https://github.com/bahrie127',
-              ),
-              _buildSocialLink(
-                Icons.camera_alt,
-                'Instagram',
-                'https://instagram.com/codewithbahri',
-              ),
-              _buildSocialLink(
-                Icons.play_circle,
-                'YouTube',
-                'https://youtube.com/@codewithbahri',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildExperienceItem(String year, String role, String company) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            margin: const EdgeInsets.only(top: 6),
-            decoration: BoxDecoration(
-              color: AppThemeColors.primary,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$role - $company',
-                  style: AppTypography.bodySmall.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppThemeColors.textPrimary,
-                  ),
-                ),
-                Text(
-                  year,
-                  style: AppTypography.labelSmall.copyWith(
-                    color: AppThemeColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _launchWhatsApp() async {
-    final url = Uri.parse(
-      'https://wa.me/6285640899224?text=Halo%20Pak%20Bahri,%20saya%20tertarik%20belajar%20Flutter%20di%20JagoFlutter.com',
-    );
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Future<void> _launchUrl(String urlString) async {
-    final url = Uri.parse(urlString);
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
-
-  Widget _buildSocialLink(IconData icon, String label, String url) {
-    return GestureDetector(
-      onTap: () => _launchUrl(url),
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: AppThemeColors.primarySurface,
-              borderRadius: AppRadius.smRadius,
-            ),
-            child: Icon(icon, color: AppThemeColors.primary, size: 20),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            label,
-            style: AppTypography.labelSmall.copyWith(
-              color: AppThemeColors.textSecondary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  
 }

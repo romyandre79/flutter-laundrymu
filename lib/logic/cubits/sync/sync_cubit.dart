@@ -22,7 +22,6 @@ class SyncCubit extends Cubit<SyncState> {
   }
 
   Future<void> goOnline() async {
-    final previousState = state;
     emit(Syncing());
     // Try to connect to backend
     final isConnected = await _apiService.checkHealth();

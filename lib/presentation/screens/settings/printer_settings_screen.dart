@@ -484,7 +484,7 @@ class _PrinterSettingsScreenState extends State<PrinterSettingsScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: availableDevices.length,
-              separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+              separatorBuilder: (context, index) => const SizedBox(height: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final device = availableDevices[index];
                 return _buildDeviceItem(context, device);

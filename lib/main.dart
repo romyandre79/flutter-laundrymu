@@ -9,6 +9,7 @@ import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_cubit.dart';
 import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_state.dart';
 import 'package:flutter_laundry_offline_app/logic/cubits/sync/sync_cubit.dart';
 import 'package:flutter_laundry_offline_app/logic/cubits/settings/settings_cubit.dart';
+import 'package:flutter_laundry_offline_app/logic/cubits/printer/printer_cubit.dart';
 import 'package:flutter_laundry_offline_app/presentation/screens/auth/login_screen.dart';
 import 'package:flutter_laundry_offline_app/presentation/screens/main_screen.dart';
 import 'package:flutter_laundry_offline_app/presentation/screens/onboarding/onboarding_screen.dart';
@@ -49,9 +50,10 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => AuthCubit()..checkAuthStatus()),
         BlocProvider(create: (_) => SyncCubit()),
         BlocProvider(create: (_) => SettingsCubit()..loadSettings()),
+        BlocProvider(create: (_) => PrinterCubit()..initialize()),
       ],
       child: MaterialApp(
-        title: 'Laundry JagoFlutter',
+        title: 'Laundry ',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         home: AuthWrapper(showOnboarding: showOnboarding),
