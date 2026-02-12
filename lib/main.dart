@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io' show Platform;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
@@ -16,6 +19,12 @@ import 'package:flutter_laundry_offline_app/presentation/screens/onboarding/onbo
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize database factory for desktop
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
 
   // Set status bar style
   SystemChrome.setSystemUIOverlayStyle(
