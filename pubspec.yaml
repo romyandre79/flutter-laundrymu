@@ -1,4 +1,4 @@
-name: flutter_laundry_offline_app
+name: kreatif_laundrymu_app
 description: "Aplikasi Kasir Laundry Offline untuk UMKM Indonesia"
 publish_to: 'none'
 version: 1.0.0+1
@@ -40,6 +40,10 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
+  windows:
+    generate: true
+    image_path: "assets/icons/logolaundry.png"
+    icon_size: 256
   image_path: "assets/icons/logolaundry.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/icons/logolaundry.png"

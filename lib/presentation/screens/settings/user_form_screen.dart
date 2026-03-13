@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
-import 'package:flutter_laundry_offline_app/data/models/user.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/user/user_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/user/user_state.dart';
+import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundrymu_app/data/models/user.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/user/user_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/user/user_state.dart';
 
 class UserFormScreen extends StatefulWidget {
   final User? user;
@@ -48,6 +48,7 @@ class _UserFormScreenState extends State<UserFormScreen> {
       if (isEditing) {
         context.read<UserCubit>().updateUser(
               id: widget.user!.id!,
+              username: _usernameController.text,
               name: _nameController.text,
               role: _selectedRole,
             );
@@ -183,12 +184,12 @@ class _UserFormScreenState extends State<UserFormScreen> {
                             TextFormField(
                               controller: _usernameController,
                               style: AppTypography.bodyMedium,
-                              enabled: !isEditing,
+                              enabled: !isEditing || _selectedRole == UserRole.owner,
                               textInputAction: TextInputAction.next,
                               decoration: _buildInputDecoration(
                                 hintText: 'Masukkan username',
                                 prefixIcon: Icons.person_outline,
-                                enabled: !isEditing,
+                                enabled: !isEditing || _selectedRole == UserRole.owner,
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {

@@ -5,17 +5,20 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
-import 'package:flutter_laundry_offline_app/core/utils/date_formatter.dart';
-import 'package:flutter_laundry_offline_app/data/database/database_helper.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_state.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/sync/sync_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/settings/settings_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/printer/printer_cubit.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/auth/login_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/main_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/onboarding/onboarding_screen.dart';
+import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundrymu_app/core/utils/date_formatter.dart';
+import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/sync/sync_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/printer/printer_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/printer/printer_cubit.dart';
+import 'package:kreatif_laundrymu_app/core/services/api_service.dart';
+import 'package:kreatif_laundrymu_app/core/services/sync_service.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/auth/login_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/main_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/onboarding/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,19 +56,35 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.showOnboarding});
 
   @override
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
+    return MultiRepositoryProvider(
       providers: [
-        BlocProvider(create: (_) => AuthCubit()..checkAuthStatus()),
-        BlocProvider(create: (_) => SyncCubit()),
-        BlocProvider(create: (_) => SettingsCubit()..loadSettings()),
-        BlocProvider(create: (_) => PrinterCubit()..initialize()),
+        RepositoryProvider(create: (_) => ApiService()),
+        RepositoryProvider(
+          create: (context) => SyncService(
+            apiService: context.read<ApiService>(),
+            dbHelper: DatabaseHelper.instance,
+          ),
+        ),
       ],
-      child: MaterialApp(
-        title: 'Laundry ',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: AuthWrapper(showOnboarding: showOnboarding),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => AuthCubit()..checkAuthStatus()),
+          BlocProvider(
+            create: (context) => SyncCubit(
+              context.read<SyncService>(),
+            ),
+          ),
+          BlocProvider(create: (_) => SettingsCubit()..loadSettings()),
+          BlocProvider(create: (_) => PrinterCubit()..initialize()),
+        ],
+        child: MaterialApp(
+          title: 'Laundry ',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          home: AuthWrapper(showOnboarding: showOnboarding),
+        ),
       ),
     );
   }

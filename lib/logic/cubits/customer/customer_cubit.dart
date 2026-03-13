@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_laundry_offline_app/data/models/customer.dart';
-import 'package:flutter_laundry_offline_app/data/repositories/customer_repository.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/customer/customer_state.dart';
+import 'package:kreatif_laundrymu_app/data/models/customer.dart';
+import 'package:kreatif_laundrymu_app/data/repositories/customer_repository.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_state.dart';
 
 class CustomerCubit extends Cubit<CustomerState> {
   final CustomerRepository _customerRepository;

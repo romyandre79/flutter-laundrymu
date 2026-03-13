@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_laundry_offline_app/data/models/customer.dart';
+import 'package:kreatif_laundrymu_app/data/models/customer.dart';
 
 abstract class CustomerState extends Equatable {
   const CustomerState();

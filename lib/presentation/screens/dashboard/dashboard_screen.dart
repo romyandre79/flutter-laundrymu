@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
-import 'package:flutter_laundry_offline_app/core/constants/app_constants.dart';
-import 'package:flutter_laundry_offline_app/core/utils/currency_formatter.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/settings/settings_cubit.dart';
-import 'package:flutter_laundry_offline_app/data/models/order.dart';
-import 'package:flutter_laundry_offline_app/data/models/user.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_state.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/customer/customer_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/dashboard/dashboard_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/dashboard/dashboard_state.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/order/order_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/service/service_cubit.dart';
+import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundrymu_app/core/utils/currency_formatter.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_cubit.dart';
+import 'package:kreatif_laundrymu_app/data/models/order.dart';
+import 'package:kreatif_laundrymu_app/data/models/user.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/dashboard/dashboard_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/dashboard/dashboard_state.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/order/order_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
 
-import 'package:flutter_laundry_offline_app/logic/cubits/sync/sync_cubit.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/orders/order_form_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/orders/order_detail_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/orders/order_list_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/services/service_list_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/screens/settings/printer_settings_screen.dart';
-import 'package:flutter_laundry_offline_app/presentation/widgets/order_card.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/sync/sync_cubit.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/orders/order_form_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/orders/order_detail_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/orders/order_list_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/services/service_list_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/screens/settings/printer_settings_screen.dart';
+import 'package:kreatif_laundrymu_app/presentation/widgets/order_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -313,6 +313,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Navigator.pop(ctx);
                                       },
                                     ),
+                                  ListTile(
+                                    leading: const Icon(Icons.description_outlined),
+                                    title: const Text("Lihat Log"),
+                                    onTap: () async {
+                                      Navigator.pop(ctx);
+                                      final logPath = await context.read<SyncCubit>().getLogPath();
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Log file: $logPath'),
+                                            backgroundColor: AppThemeColors.primary,
+                                            duration: const Duration(seconds: 5),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
                                 ],
                               ),
                             ),

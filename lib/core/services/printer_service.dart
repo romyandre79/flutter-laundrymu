@@ -1,8 +1,8 @@
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_laundry_offline_app/data/models/order.dart';
-import 'package:flutter_laundry_offline_app/core/services/laundry_print.dart';
+import 'package:kreatif_laundrymu_app/data/models/order.dart';
+import 'package:kreatif_laundrymu_app/core/services/laundry_print.dart';
 
 class BluetoothDevice {
   final String name;

@@ -1,8 +1,8 @@
-import 'package:flutter_laundry_offline_app/data/database/database_helper.dart';
-import 'package:flutter_laundry_offline_app/data/models/order.dart';
-import 'package:flutter_laundry_offline_app/data/models/order_item.dart';
-import 'package:flutter_laundry_offline_app/data/models/payment.dart';
-import 'package:flutter_laundry_offline_app/data/repositories/customer_repository.dart';
+import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundrymu_app/data/models/order.dart';
+import 'package:kreatif_laundrymu_app/data/models/order_item.dart';
+import 'package:kreatif_laundrymu_app/data/models/payment.dart';
+import 'package:kreatif_laundrymu_app/data/repositories/customer_repository.dart';
 
 class OrderRepository {
   final DatabaseHelper _databaseHelper;

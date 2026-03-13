@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_laundry_offline_app/core/constants/app_constants.dart';
-import 'package:flutter_laundry_offline_app/core/services/api_service.dart';
-import 'package:flutter_laundry_offline_app/data/repositories/settings_repository.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/settings/settings_state.dart';
+import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundrymu_app/core/services/api_service.dart';
+import 'package:kreatif_laundrymu_app/data/repositories/settings_repository.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {
   final SettingsRepository _repository;

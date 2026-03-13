@@ -1,6 +1,6 @@
-import 'package:flutter_laundry_offline_app/core/utils/password_helper.dart';
-import 'package:flutter_laundry_offline_app/data/database/database_helper.dart';
-import 'package:flutter_laundry_offline_app/data/models/user.dart';
+import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
+import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundrymu_app/data/models/user.dart';
 
 class UserRepository {
   final DatabaseHelper _databaseHelper;
@@ -107,9 +107,10 @@ class UserRepository {
     );
   }
 
-  /// Update user info (not password)
+  /// Update user info
   Future<User> updateUser({
     required int id,
+    required String username,
     required String name,
     required UserRole role,
   }) async {
@@ -121,11 +122,26 @@ class UserRepository {
       throw Exception('User tidak ditemukan');
     }
 
+    // specific check: if username is changing, ensure uniqueness
+    if (existing.username != username.toLowerCase().trim()) {
+       final duplicate = await getUserByUsername(username);
+       if (duplicate != null) {
+         throw Exception('Username sudah digunakan');
+       }
+       
+       // Validate username format
+       final usernameValidation = PasswordHelper.validateUsername(username);
+       if (usernameValidation != null) {
+         throw Exception(usernameValidation);
+       }
+    }
+
     // Update user
     final now = DateTime.now().toIso8601String();
     await db.update(
       'users',
       {
+        'username': username.toLowerCase().trim(),
         'name': name.trim(),
         'role': role.value,
         'updated_at': now,
@@ -135,6 +151,7 @@ class UserRepository {
     );
 
     return existing.copyWith(
+      username: username.toLowerCase().trim(),
       name: name.trim(),
       role: role,
       updatedAt: DateTime.now(),

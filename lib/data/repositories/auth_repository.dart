@@ -1,7 +1,7 @@
-import 'package:flutter_laundry_offline_app/core/services/session_service.dart';
-import 'package:flutter_laundry_offline_app/core/utils/password_helper.dart';
-import 'package:flutter_laundry_offline_app/data/database/database_helper.dart';
-import 'package:flutter_laundry_offline_app/data/models/user.dart';
+import 'package:kreatif_laundrymu_app/core/services/session_service.dart';
+import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
+import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundrymu_app/data/models/user.dart';
 
 class AuthRepository {
   final DatabaseHelper _databaseHelper;
@@ -49,6 +49,9 @@ class AuthRepository {
       role: user.role.value,
       name: user.name,
     );
+    
+    // Cache password for sync operations
+    session.cachePassword(password);
 
     return user;
   }

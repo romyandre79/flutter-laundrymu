@@ -1,7 +1,7 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:flutter_laundry_offline_app/core/constants/app_constants.dart';
-import 'package:flutter_laundry_offline_app/core/utils/password_helper.dart';
+import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -224,6 +224,15 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       // Add change column to payments table
       await db.execute('ALTER TABLE payments ADD COLUMN change INTEGER DEFAULT 0');
+    }
+    if (oldVersion < 3) {
+      // Add sync columns for orders
+      await db.execute('ALTER TABLE orders ADD COLUMN is_synced INTEGER DEFAULT 0');
+      await db.execute('ALTER TABLE orders ADD COLUMN server_id INTEGER');
+      // Add sync columns for services
+      await db.execute('ALTER TABLE services ADD COLUMN server_id INTEGER');
+      // Add sync columns for customers
+      await db.execute('ALTER TABLE customers ADD COLUMN server_id INTEGER');
     }
   }
 

@@ -18,6 +18,23 @@ class SessionService {
     return _instance!;
   }
 
+  static const String _keySyncPassword = 'sync_password';
+
+  /// Cache password for sync operations (persisted in SharedPreferences)
+  void cachePassword(String password) {
+    _prefs!.setString(_keySyncPassword, password);
+  }
+
+  /// Get cached password for sync
+  String? getCachedPassword() {
+    return _prefs!.getString(_keySyncPassword);
+  }
+
+  /// Check if we have credentials for sync
+  bool hasCachedCredentials() {
+    return getUsername() != null && getCachedPassword() != null;
+  }
+
   /// Save user session after successful login
   Future<void> saveSession({
     required int userId,
@@ -64,6 +81,7 @@ class SessionService {
     await _prefs!.remove(_keyUserRole);
     await _prefs!.remove(_keyUserName);
     await _prefs!.setBool(_keyIsLoggedIn, false);
+    await _prefs!.remove(_keySyncPassword);
   }
 
   /// Get all session data as Map
@@ -74,6 +92,7 @@ class SessionService {
       'role': getUserRole(),
       'name': getUserName(),
       'isLoggedIn': isLoggedIn(),
+      'hasCachedCredentials': hasCachedCredentials(),
     };
   }
 }

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_laundry_offline_app/core/constants/app_constants.dart';
-import 'package:flutter_laundry_offline_app/core/theme/app_theme.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_cubit.dart';
-import 'package:flutter_laundry_offline_app/logic/cubits/auth/auth_state.dart';
-import 'package:flutter_laundry_offline_app/presentation/widgets/custom_text_field.dart';
-import 'package:flutter_laundry_offline_app/presentation/widgets/custom_button.dart';
+import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
+import 'package:kreatif_laundrymu_app/presentation/widgets/custom_text_field.dart';
+import 'package:kreatif_laundrymu_app/presentation/widgets/custom_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -129,10 +129,12 @@ class _LoginScreenState extends State<LoginScreen>
                                 borderRadius: AppRadius.xlRadius,
                                 boxShadow: AppShadows.large,
                               ),
-                              child: const Icon(
-                                Icons.local_laundry_service,
-                                size: 48,
-                                color: AppThemeColors.primary,
+                              child: Padding(
+                                padding: const EdgeInsets.all(AppSpacing.md),
+                                child: Image.asset(
+                                  'assets/icons/logolaundry.png',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
 
