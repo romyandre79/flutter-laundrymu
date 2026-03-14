@@ -8,7 +8,7 @@ class AppConstants {
 
   // Database
   static const String databaseName = 'laundryfull.db';
-  static const int databaseVersion = 3;
+  static const int databaseVersion = 4;
 
   // Invoice
   static const String defaultInvoicePrefix = 'LNDR';
@@ -48,6 +48,9 @@ class AppConstants {
   static const String keyLaundryName = 'laundry_name';
   static const String keyLaundryAddress = 'laundry_address';
   static const String keyLaundryPhone = 'laundry_phone';
+  static const String keyPlantId = 'plant_id';
+  static const String keyPlantCode = 'plant_code';
+  static const String keyPlantName = 'plant_name';
   static const String keyInvoicePrefix = 'invoice_prefix';
   static const String keyPrinterAddress = 'printer_address';
   static const String keyLastInvoiceDate = 'last_invoice_date';
@@ -57,8 +60,13 @@ class AppConstants {
   static const String defaultLaundryName = 'Kreatif Laundry';
   static const String defaultLaundryAddress = 'Jalan Mrutu Kalianyar 1c Surabaya';
   static const String defaultLaundryPhone = '6281932701147';
+  static const String defaultPlantId = '1';
+  static const String defaultPlantCode = 'PABJ';
+  static const String defaultPlantName = 'Cabang Jakarta';
   static const String defaultBaseUrl = 'http://localhost:8080';
 
   // Base URL Key
   static const String keyBaseUrl = 'base_url';
+  static const String keyFonnteToken = 'fonnte_token';
+  static const String defaultFonnteToken = '081932701147';
 }

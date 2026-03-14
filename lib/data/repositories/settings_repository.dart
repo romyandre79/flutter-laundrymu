@@ -49,7 +49,10 @@ class SettingsRepository {
     final result = await db.query('app_settings');
 
     return Map.fromEntries(
-      result.map((e) => MapEntry(e['key'] as String, e['value'] as String)),
+      result.map((e) => MapEntry(
+            (e['key'] ?? '').toString(),
+            (e['value'] ?? '').toString(),
+          )),
     );
   }
 

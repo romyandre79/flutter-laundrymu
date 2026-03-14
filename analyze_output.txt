@@ -1,0 +1,10 @@
+Analyzing flutter-laundrymu...                                  
+
+warning - This default clause is covered by the previous cases - lib\data\models\user.dart:21:7 - unreachable_switch_default
+   info - The import of 'package:sqflite/sqflite.dart' is unnecessary because all of the used elements are also provided by the import of 'package:sqflite_common_ffi/sqflite_ffi.dart' - lib\main.dart:5:8 - unnecessary_import
+warning - Duplicate import - lib\main.dart:16:8 - duplicate_import
+warning - The receiver can't be null, so the null-aware operator '?.' is unnecessary - lib\presentation\screens\settings\settings_screen.dart:689:35 - invalid_null_aware_operator
+warning - The receiver can't be null, so the null-aware operator '?.' is unnecessary - lib\presentation\screens\settings\settings_screen.dart:696:39 - invalid_null_aware_operator
+  error - The named parameter 'showOnboarding' is required, but there's no corresponding argument - test\widget_test.dart:16:35 - missing_required_argument
+
+6 issues found. (ran in 17.0s)

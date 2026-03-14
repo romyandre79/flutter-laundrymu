@@ -104,10 +104,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
           );
           screens.add(
-            BlocProvider(
-              create: (_) => UserCubit(),
-              child: const SettingsScreen(),
-            ),
+            const SettingsScreen(),
           );
         }
 

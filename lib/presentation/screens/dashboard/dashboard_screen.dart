@@ -50,6 +50,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return 'Owner';
       case UserRole.kasir:
         return 'Kasir';
+      default:
+        return 'User';
     }
   }
 

@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:sqflite/sqflite.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
 import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
@@ -234,6 +236,10 @@ class DatabaseHelper {
       // Add sync columns for customers
       await db.execute('ALTER TABLE customers ADD COLUMN server_id INTEGER');
     }
+    if (oldVersion < 4) {
+      // Add sync columns for orders
+      await db.execute('ALTER TABLE orders ADD COLUMN plant_id INTEGER DEFAULT 0');
+    }
   }
 
   // Utility methods
@@ -241,6 +247,17 @@ class DatabaseHelper {
     final db = await instance.database;
     db.close();
     _database = null;
+  }
+
+  Future<String> getDbPath() async {
+    final String dbPath;
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      final docsDir = await getApplicationDocumentsDirectory();
+      dbPath = docsDir.path;
+    } else {
+      dbPath = await getDatabasesPath();
+    }
+    return join(dbPath, AppConstants.databaseName);
   }
 
   Future<void> deleteDatabase() async {

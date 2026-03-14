@@ -6,6 +6,10 @@ class LaundryInfo {
   final String phone;
   final String invoicePrefix;
   final String baseUrl;
+  final String fonnteToken;
+  final String plantId;
+  final String plantCode;
+  final String plantName;
 
   const LaundryInfo({
     required this.name,
@@ -13,6 +17,10 @@ class LaundryInfo {
     required this.phone,
     required this.invoicePrefix,
     required this.baseUrl,
+    required this.fonnteToken,
+    required this.plantId,
+    required this.plantCode,
+    required this.plantName,
   });
 
   LaundryInfo copyWith({
@@ -21,6 +29,10 @@ class LaundryInfo {
     String? phone,
     String? invoicePrefix,
     String? baseUrl,
+    String? fonnteToken,
+    String? plantId,
+    String? plantCode,
+    String? plantName,
   }) {
     return LaundryInfo(
       name: name ?? this.name,
@@ -28,6 +40,10 @@ class LaundryInfo {
       phone: phone ?? this.phone,
       invoicePrefix: invoicePrefix ?? this.invoicePrefix,
       baseUrl: baseUrl ?? this.baseUrl,
+      fonnteToken: fonnteToken ?? this.fonnteToken,
+      plantId: plantId ?? this.plantId,
+      plantCode: plantCode ?? this.plantCode,
+      plantName: plantName ?? this.plantName,
     );
   }
 }

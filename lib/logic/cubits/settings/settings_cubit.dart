@@ -31,6 +31,10 @@ class SettingsCubit extends Cubit<SettingsState> {
             AppConstants.defaultInvoicePrefix,
         baseUrl: settings[AppConstants.keyBaseUrl] ??
             AppConstants.defaultBaseUrl,
+        fonnteToken: settings[AppConstants.keyFonnteToken] ?? AppConstants.defaultFonnteToken,
+        plantId: settings[AppConstants.keyPlantId] ?? AppConstants.defaultPlantId,
+        plantCode: settings[AppConstants.keyPlantCode] ?? AppConstants.defaultPlantCode,
+        plantName: settings[AppConstants.keyPlantName] ?? AppConstants.defaultPlantName,
       );
 
       // Initialize ApiService with loaded URL
@@ -170,6 +174,94 @@ class SettingsCubit extends Cubit<SettingsState> {
     } catch (e) {
       emit(SettingsError(
           message: 'Gagal memperbarui prefix invoice: ${e.toString()}'));
+    }
+  }
+
+  Future<void> updateFonnteToken(String token) async {
+    emit(SettingsUpdating());
+
+    try {
+      await _repository.setSetting('fonnte_token', token.trim());
+
+      final updatedInfo = _currentInfo!.copyWith(fonnteToken: token.trim());
+      _currentInfo = updatedInfo;
+
+      emit(SettingsUpdated(
+        message: 'Token Fonnte berhasil diperbarui',
+        laundryInfo: updatedInfo,
+      ));
+    } catch (e) {
+      emit(SettingsError(
+          message: 'Gagal memperbarui token Fonnte: ${e.toString()}'));
+    }
+  }
+
+  Future<void> updatePlantId(String plantId) async {
+    if (plantId.trim().isEmpty) {
+      emit(const SettingsError(message: 'Plant ID tidak boleh kosong'));
+      return;
+    }
+
+    emit(SettingsUpdating());
+
+    try {
+      await _repository.setSetting(AppConstants.keyPlantId, plantId.trim());
+
+      final updatedInfo = _currentInfo!.copyWith(plantId: plantId.trim());
+      _currentInfo = updatedInfo;
+
+      emit(SettingsUpdated(
+        message: 'Plant ID berhasil diperbarui',
+        laundryInfo: updatedInfo,
+      ));
+    } catch (e) {
+      emit(SettingsError(message: 'Gagal memperbarui Plant ID: ${e.toString()}'));
+    }
+  }
+
+  Future<void> updatePlantCode(String plantCode) async {
+    if (plantCode.trim().isEmpty) {
+      emit(const SettingsError(message: 'Plant Code tidak boleh kosong'));
+      return;
+    }
+
+    emit(SettingsUpdating());
+
+    try {
+      await _repository.setSetting(AppConstants.keyPlantCode, plantCode.trim());
+
+      final updatedInfo = _currentInfo!.copyWith(plantCode: plantCode.trim());
+      _currentInfo = updatedInfo;
+
+      emit(SettingsUpdated(
+        message: 'Plant Code berhasil diperbarui',
+        laundryInfo: updatedInfo,
+      ));
+    } catch (e) {
+      emit(SettingsError(message: 'Gagal memperbarui Plant Code: ${e.toString()}'));
+    }
+  }
+
+  Future<void> updatePlantName(String plantName) async {
+    if (plantName.trim().isEmpty) {
+      emit(const SettingsError(message: 'Plant Name tidak boleh kosong'));
+      return;
+    }
+
+    emit(SettingsUpdating());
+
+    try {
+      await _repository.setSetting(AppConstants.keyPlantName, plantName.trim());
+
+      final updatedInfo = _currentInfo!.copyWith(plantName: plantName.trim());
+      _currentInfo = updatedInfo;
+
+      emit(SettingsUpdated(
+        message: 'Plant Name berhasil diperbarui',
+        laundryInfo: updatedInfo,
+      ));
+    } catch (e) {
+      emit(SettingsError(message: 'Gagal memperbarui Plant Name: ${e.toString()}'));
     }
   }
 }

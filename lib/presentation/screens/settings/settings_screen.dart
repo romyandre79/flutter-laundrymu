@@ -15,6 +15,7 @@ import 'package:kreatif_laundrymu_app/presentation/screens/settings/user_managem
 import 'package:kreatif_laundrymu_app/presentation/screens/services/service_list_screen.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/customers/customer_list_screen.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/settings/printer_settings_screen.dart';
+import 'package:kreatif_laundrymu_app/data/services/database_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -38,13 +39,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   } */
 
-  String _getRoleDisplayName(UserRole role) {
-    switch (role) {
-      case UserRole.owner:
-        return 'Owner';
-      case UserRole.kasir:
-        return 'Kasir';
-    }
+  String _getRoleDisplayName(UserRole? role) {
+    if (role == null) return 'User';
+    return role.displayName;
   }
 
   void _showLogoutDialog(BuildContext context) {
@@ -85,6 +82,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showAboutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.lgRadius),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppThemeColors.primarySurface,
+                borderRadius: AppRadius.smRadius,
+              ),
+              child: const Icon(Icons.info, color: AppThemeColors.primary),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Text('About', style: AppTypography.titleLarge),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildAboutRow('Creator', 'Kreatif'),
+            const SizedBox(height: AppSpacing.md),
+            _buildAboutRow('PhoneNo', '081932701147'),
+            const SizedBox(height: AppSpacing.md),
+            _buildAboutRow('Address', 'Jl Serut Jaya No 74, Bekasi'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Tutup',
+              style: AppTypography.labelMedium.copyWith(color: AppThemeColors.primary),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAboutRow(String label, String value) {
+    return Row(
+      children: [
+        Text(
+          '$label:',
+          style: AppTypography.bodyMedium.copyWith(
+            fontWeight: FontWeight.w600,
+            color: AppThemeColors.textSecondary,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.sm),
+        Text(
+          value,
+          style: AppTypography.bodyMedium,
+        ),
+      ],
     );
   }
 
@@ -338,6 +397,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         body: BlocBuilder<AuthCubit, AuthState>(
           builder: (context, authState) {
             final user = authState is AuthAuthenticated ? authState.user : null;
+            final settingsCubit = context.watch<SettingsCubit>();
 
             return Column(
               children: [
@@ -347,10 +407,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // Settings content
                 Expanded(
                   child: BlocBuilder<SettingsCubit, SettingsState>(
+                    bloc: settingsCubit,
                     builder: (context, settingsState) {
                       // Get laundry info from state
                       LaundryInfo? laundryInfo;
-                      final settingsCubit = context.read<SettingsCubit>();
                       if (settingsState is SettingsLoaded) {
                         laundryInfo = settingsState.laundryInfo;
                       } else if (settingsState is SettingsUpdated) {
@@ -365,6 +425,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: AppSpacing.lg),
 
                           // Laundry Info Section
+                          if (user != null && user.role == UserRole.owner)
                           _buildSection(
                             title: 'Informasi Laundry',
                             children: [
@@ -372,18 +433,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context: context,
                                 icon: Icons.store,
                                 title: 'Nama Laundry',
-                                subtitle:
-                                    laundryInfo?.name ??
-                                    AppConstants.defaultLaundryName,
+                                subtitle: (laundryInfo?.name ??
+                                        AppConstants.defaultLaundryName)
+                                    .toString(),
                                 onTap: () => _showEditDialog(
                                   title: 'Edit Nama Laundry',
-                                  currentValue:
-                                      laundryInfo?.name ??
-                                      AppConstants.defaultLaundryName,
+                                  currentValue: (laundryInfo?.name ??
+                                          AppConstants.defaultLaundryName)
+                                      .toString(),
                                   hint: 'Masukkan nama laundry',
                                   icon: Icons.store,
-                                  onSave: (value) =>
-                                      context.read<SettingsCubit>().updateLaundryName(value),
+                                  onSave: (value) => context
+                                      .read<SettingsCubit>()
+                                      .updateLaundryName(value),
                                 ),
                               ),
                               _buildDivider(),
@@ -391,18 +453,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context: context,
                                 icon: Icons.location_on,
                                 title: 'Alamat',
-                                subtitle:
-                                    laundryInfo?.address ??
-                                    AppConstants.defaultLaundryAddress,
+                                subtitle: (laundryInfo?.address ??
+                                        AppConstants.defaultLaundryAddress)
+                                    .toString(),
                                 onTap: () => _showEditDialog(
                                   title: 'Edit Alamat',
-                                  currentValue:
-                                      laundryInfo?.address ??
-                                      AppConstants.defaultLaundryAddress,
+                                  currentValue: (laundryInfo?.address ??
+                                          AppConstants.defaultLaundryAddress)
+                                      .toString(),
                                   hint: 'Masukkan alamat laundry',
                                   icon: Icons.location_on,
                                   maxLines: 2,
-                                  onSave: (value) => context.read<SettingsCubit>()
+                                  onSave: (value) => context
+                                      .read<SettingsCubit>()
                                       .updateLaundryAddress(value),
                                 ),
                               ),
@@ -411,27 +474,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context: context,
                                 icon: Icons.phone,
                                 title: 'Nomor HP',
-                                subtitle:
-                                    laundryInfo?.phone ??
-                                    AppConstants.defaultLaundryPhone,
+                                subtitle: (laundryInfo?.phone ??
+                                        AppConstants.defaultLaundryPhone)
+                                    .toString(),
                                 onTap: () => _showEditDialog(
                                   title: 'Edit Nomor HP',
-                                  currentValue:
-                                      laundryInfo?.phone ??
-                                      AppConstants.defaultLaundryPhone,
+                                  currentValue: (laundryInfo?.phone ??
+                                          AppConstants.defaultLaundryPhone)
+                                      .toString(),
                                   hint: 'Masukkan nomor HP',
                                   icon: Icons.phone,
                                   keyboardType: TextInputType.phone,
+                                  onSave: (value) => context
+                                      .read<SettingsCubit>()
+                                      .updateLaundryPhone(value),
+                                ),
+                              ),
+                              _buildDivider(),
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.store,
+                                title: 'Cabang ID',
+                                subtitle: laundryInfo?.plantId ?? AppConstants.defaultPlantId,
+                                 onTap: () => _showEditDialog(
+                                   title: 'Ubah Cabang ID',
+                                   currentValue: (laundryInfo?.plantId ?? '').toString(),
+                                  hint: 'Masukkan Cabang ID',
+                                  icon: Icons.store,
                                   onSave: (value) =>
-                                      context.read<SettingsCubit>().updateLaundryPhone(value),
+                                      context.read<SettingsCubit>().updatePlantId(value),
+                                ),
+                              ),
+                              _buildDivider(),
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.store,
+                                title: 'Kode Cabang',
+                                subtitle: (laundryInfo?.plantCode ?? AppConstants.defaultPlantCode),
+                                 onTap: () => _showEditDialog(
+                                   title: 'Ubah Kode Cabang',
+                                   currentValue: (laundryInfo?.plantCode ?? '').toString(),
+                                  hint: 'Masukkan Kode Cabang',
+                                  icon: Icons.store,
+                                  onSave: (value) =>
+                                      context.read<SettingsCubit>().updatePlantCode(value),
                                 ),
                               ),
                             ],
                           ),
 
                           // Service Management Section
+                          if (user != null && user.role == UserRole.owner)
                           _buildSection(
-                            title: 'Layanan',
+                            title: 'Master Data',
                             children: [
                               _buildSettingTile(
                                 context: context,
@@ -450,13 +545,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   );
                                 },
                               ),
-                            ],
-                          ),
-
-                          // Customer Management Section
-                          _buildSection(
-                            title: 'Pelanggan',
-                            children: [
+                              _buildDivider(),
                               _buildSettingTile(
                                 context: context,
                                 icon: Icons.people_alt,
@@ -478,6 +567,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
 
                           // App Settings Section
+                          if (user != null && user.role == UserRole.owner)
                           _buildSection(
                             title: 'Pengaturan Aplikasi',
                             children: [
@@ -485,19 +575,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 context: context,
                                 icon: Icons.receipt,
                                 title: 'Prefix Invoice',
-                                subtitle:
-                                    laundryInfo?.invoicePrefix ??
-                                    AppConstants.defaultInvoicePrefix,
+                                subtitle: (laundryInfo?.invoicePrefix ??
+                                        AppConstants.defaultInvoicePrefix)
+                                    .toString(),
                                 onTap: () => _showEditDialog(
                                   title: 'Edit Prefix Invoice',
-                                  currentValue:
-                                      laundryInfo?.invoicePrefix ??
-                                      AppConstants.defaultInvoicePrefix,
+                                  currentValue: (laundryInfo?.invoicePrefix ??
+                                          AppConstants.defaultInvoicePrefix)
+                                      .toString(),
                                   hint: 'Masukkan prefix (maks 10 karakter)',
                                   icon: Icons.receipt,
                                   maxLength: 10,
-                                  onSave: (value) =>
-                                      context.read<SettingsCubit>().updateInvoicePrefix(value),
+                                  onSave: (value) => context
+                                      .read<SettingsCubit>()
+                                      .updateInvoicePrefix(value),
                                 ),
                               ),
                               _buildDivider(),
@@ -516,10 +607,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   );
                                 },
                               ),
+                              _buildDivider(),
+                               _buildSettingTile(
+                                context: context,
+                                icon: Icons.vpn_key,
+                                title: 'Fonnte API Token',
+                                 subtitle: (laundryInfo?.fonnteToken ?? '').toString().isEmpty
+                                     ? 'Belum diatur'
+                                     : 'Sudah diatur (ketuk untuk ubah)',
+                                 onTap: () => _showEditDialog(
+                                   title: 'Ubah Token Fonnte',
+                                   currentValue: (laundryInfo?.fonnteToken ?? '').toString(),
+                                  hint: 'Masukkan token API Fonnte',
+                                  icon: Icons.vpn_key,
+                                  onSave: (value) =>
+                                      context.read<SettingsCubit>().updateFonnteToken(value),
+                                ),
+                              ),
                             ],
-                          ),
+                          ),                         
 
                           // User Management Section
+                          if (user != null && user.role == UserRole.owner)
                           _buildSection(
                             title: 'Manajemen User',
                             children: [
@@ -551,6 +660,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
 
+                          if (user != null && user.role == UserRole.owner)
+                            _buildSection(
+                              title: 'Manajemen Data',
+                              children: [
+                                _buildSettingTile(
+                                  context: context,
+                                  icon: Icons.save,
+                                  title: 'Backup Database',
+                                  subtitle: 'Simpan data ke penyimpanan lokal',
+                                  onTap: () async {
+                                    try {
+                                      await DatabaseService().backupDatabase();
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Backup berhasil'), backgroundColor: Colors.green),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Backup gagal: $e'), backgroundColor: Colors.red),
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                                _buildDivider(),
+                                _buildSettingTile(
+                                  context: context,
+                                  icon: Icons.restore,
+                                  title: 'Restore Database',
+                                  subtitle: 'Pulihkan data dari file backup',
+                                  onTap: () async {
+                                    try {
+                                        // Confirm first
+                                        final confirm = await showDialog<bool>(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: const Text('Konfirmasi Restore'),
+                                            content: const Text('Restore akan menimpa data yang ada. Lanjutkan?'),
+                                            actions: [
+                                              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                                              ElevatedButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Restore')),
+                                            ],
+                                          ),
+                                        );
+
+                                        if (confirm == true) {
+                                          await DatabaseService().restoreDatabase();
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Restore berhasil. Silakan restart aplikasi.'), backgroundColor: Colors.green),
+                                            );
+                                          }
+                                        }
+                                    } catch (e) {
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Restore gagal: $e'), backgroundColor: Colors.red),
+                                        );
+                                      }
+                                    }
+                                  },
+                                ),
+                                _buildDivider(),
+                                _buildSettingTile(
+                                  context: context,
+                                  icon: Icons.delete_forever,
+                                  title: 'Reset Database',
+                                  subtitle: 'Hapus semua data (Hati-hati!)',
+                                  onTap: () async {
+                                     final confirm = await showDialog<bool>(
+                                       context: context,
+                                       builder: (ctx) => AlertDialog(
+                                         title: const Text('Reset Database?'),
+                                         content: const Text('Semua data akan dihapus permanen. Tindakan ini tidak dapat dibatalkan!'),
+                                         actions: [
+                                           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
+                                           ElevatedButton(
+                                             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                             onPressed: () => Navigator.pop(ctx, true),
+                                             child: const Text('Reset', style: TextStyle(color: Colors.white)),
+                                           ),
+                                         ],
+                                       ),
+                                     );
+
+                                     if (confirm == true) {
+                                        try {
+                                          await DatabaseService().resetDatabase();
+                                          if (mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Database berhasil di-reset'), backgroundColor: Colors.green),
+                                            );
+                                            // Optionally logout or restart
+                                            context.read<AuthCubit>().logout();
+                                          }
+                                        } catch (e) {
+                                           if (mounted) {
+                                             ScaffoldMessenger.of(context).showSnackBar(
+                                               SnackBar(content: Text('Reset gagal: $e'), backgroundColor: Colors.red),
+                                             );
+                                           }
+                                        }
+                                     }
+                                  },
+                                ),
+                              ],
+                            ),
+
                           // About Section
                           _buildSection(
                             title: 'Tentang Aplikasi',
@@ -563,23 +782,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 showArrow: false,
                                 onTap: null,
                               ),
-                              // _buildDivider(),
-                              // _buildSettingTile(
-                              //   context: context,
-                              //   icon: Icons.school,
-                              //   title: '.com',
-                              //   subtitle: 'Belajar Flutter dari NOL hingga PRO',
-                              //   showArrow: false,
-                              //   onTap: null,
-                              // ),
+                              _buildDivider(),
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.info,
+                                title: 'About',
+                                subtitle: 'Informasi Pembuat',
+                                onTap: () => _showAboutDialog(context),
+                              ),
                             ],
                           ),
-
-                          // Mentor Section
-                          // _buildSection(
-                          //   title: 'Creator',
-                          //   children: [_buildMentorCard()],
-                          // ),
 
                           // Logout Button
                           Padding(
@@ -699,7 +911,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             ),
                             Text(
-                              '@${user.username}',
+                               '@${user.username}',
                               style: AppTypography.bodySmall.copyWith(
                                 color: Colors.white70,
                               ),

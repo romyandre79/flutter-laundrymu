@@ -9,6 +9,8 @@ extension UserRoleExtension on UserRole {
         return 'owner';
       case UserRole.kasir:
         return 'kasir';
+      default:
+        return 'kasir';
     }
   }
 
@@ -18,6 +20,8 @@ extension UserRoleExtension on UserRole {
         return 'Owner';
       case UserRole.kasir:
         return 'Kasir';
+      default:
+        return 'User';
     }
   }
 
