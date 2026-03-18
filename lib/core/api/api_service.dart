@@ -1,47 +1,37 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:kreatif_laundrymu_app/core/api/api_config.dart';
 import 'package:kreatif_laundrymu_app/core/services/log_service.dart';
 
 class ApiService {
   final Dio _dio;
   final LogService _logService = LogService();
 
-  // Singleton instance
-  static final ApiService _instance = ApiService._internal();
-
-  factory ApiService() {
-    return _instance;
-  }
-
-  ApiService._internal()
+  ApiService()
       : _dio = Dio(BaseOptions(
-          baseUrl: 'http://localhost:8080',
+          baseUrl: ApiConfig.baseUrl,
           connectTimeout: const Duration(seconds: 10),
           receiveTimeout: const Duration(seconds: 10),
           headers: {'Content-Type': 'application/json'},
         ));
 
-  Dio get client => _dio;
-
-  void setBaseUrl(String url) {
-    if (!url.startsWith('http')) {
-       url = 'http://$url';
-    }
+  Future<void> setBaseUrl(String url) async {
     _dio.options.baseUrl = url;
   }
 
-  void setAuthToken(String token) {
+  Future<void> setAuthToken(String token) async {
     _dio.options.headers['Authorization'] = 'Bearer $token';
   }
 
   Future<String?> login(String username, String password) async {
     // Log request (mask password)
-    await _logService.logRequest('auth_login', {
+    await _logService.logRequest('/api/auth/login', {
       'username': username, 
       'password': '***'
     });
 
     try {
+      // Use standard auth endpoint instead of executeFlow
       final response = await _dio.post('/api/auth/login', data: {
         'username': username,
         'password': password,
@@ -51,6 +41,8 @@ class ApiService {
       await _logService.logResponse('auth_login', response.data);
 
       if (response.data['code'] == 200) {
+        // Token is in data.token based on Nuxt useAuth implementation
+        // res.data -> { code: 200, data: { token: "...", user: ... } }
         final token = response.data['data']['token'];
         return token;
       }
@@ -66,7 +58,6 @@ class ApiService {
     // Log the request
     await _logService.logRequest(flowName, data);
 
-    // Basic FormData construction
     final formData = FormData.fromMap({
       'flowname': flowName,
       'menu': menu,
@@ -76,22 +67,24 @@ class ApiService {
     data.forEach((key, value) {
       if (value != null) {
         if (value is Map || value is List) {
+          // Serialize objects and lists to JSON strings
           formData.fields.add(MapEntry(key, jsonEncode(value)));
         } else if (value is bool) {
+          // Convert booleans to '1' or '0'
           formData.fields.add(MapEntry(key, value ? '1' : '0'));
         } else {
+          // Convert everything else to string
           formData.fields.add(MapEntry(key, value.toString()));
         }
       }
     });
 
     try {
-      // Assuming a standard endpoint for flow execution, similar to pos
-      final response = await _dio.post('/api/flow/execute', data: formData);
+      final response = await _dio.post(ApiConfig.executeFlowEndpoint, data: formData);
       
       // Log the success response
       await _logService.logResponse(flowName, response.data);
-
+      
       return response;
     } catch (e) {
       // Log the error
@@ -100,13 +93,39 @@ class ApiService {
     }
   }
 
-  Future<bool> checkHealth() async {
+  Future<Response> get(String endpoint, {Map<String, dynamic>? queryParameters}) async {
     try {
-      // Simple health check or ping
-      final response = await _dio.get('/health');
-      return response.statusCode == 200;
+      final response = await _dio.get(endpoint, queryParameters: queryParameters);
+      return response;
     } catch (e) {
-      return false;
+      rethrow;
+    }
+  }
+
+  Future<Response> post(String endpoint, {dynamic data}) async {
+    try {
+      final response = await _dio.post(endpoint, data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+    Future<Response> put(String endpoint, {dynamic data}) async {
+    try {
+      final response = await _dio.put(endpoint, data: data);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Response> delete(String endpoint) async {
+    try {
+      final response = await _dio.delete(endpoint);
+      return response;
+    } catch (e) {
+      rethrow;
     }
   }
 }

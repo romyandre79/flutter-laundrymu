@@ -240,6 +240,10 @@ class DatabaseHelper {
       // Add sync columns for orders
       await db.execute('ALTER TABLE orders ADD COLUMN plant_id INTEGER DEFAULT 0');
     }
+    if (oldVersion < 5) {
+      // Add sync columns for orders
+      await db.execute('ALTER TABLE orders ADD COLUMN is_synced INTEGER DEFAULT 0');
+    }
   }
 
   // Utility methods

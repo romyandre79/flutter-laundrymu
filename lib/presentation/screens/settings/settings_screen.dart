@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:kreatif_laundrymu_app/core/api/api_config.dart';
 import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
 import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
 import 'package:kreatif_laundrymu_app/data/models/user.dart';
@@ -9,6 +10,7 @@ import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_cubit.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_state.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/user/user_cubit.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/sync/sync_cubit.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_cubit.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/settings/user_management_screen.dart';
@@ -16,6 +18,9 @@ import 'package:kreatif_laundrymu_app/presentation/screens/services/service_list
 import 'package:kreatif_laundrymu_app/presentation/screens/customers/customer_list_screen.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/settings/printer_settings_screen.dart';
 import 'package:kreatif_laundrymu_app/data/services/database_service.dart';
+import 'package:kreatif_laundrymu_app/core/api/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -349,6 +354,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void _showServerUrlDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentUrl = prefs.getString('api_base_url') ?? ApiConfig.baseUrl;
+    
+    _showEditDialog(
+      title: 'Server URL',
+      currentValue: currentUrl,
+      hint: 'https://api.example.com',
+      icon: Icons.cloud,
+      onSave: (value) async {
+        await prefs.setString('api_base_url', value);
+        if (mounted) {
+          context.read<ApiService>().setBaseUrl(value);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Server URL updated'),
+              backgroundColor: AppThemeColors.success,
+            ),
+          );
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -423,6 +452,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         padding: EdgeInsets.zero,
                         children: [
                           const SizedBox(height: AppSpacing.lg),
+
+                          // Server Sync Section
+                          _buildSection(
+                            title: 'Server Sync',
+                            children: [
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.cloud,
+                                title: 'Server URL',
+                                subtitle: 'Atur URL server untuk sinkronisasi',
+                                onTap: _showServerUrlDialog,
+                              ),
+                              _buildDivider(),
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.sync,
+                                title: 'Sync Data',
+                                subtitle: 'Upload transaksi & download master data',
+                                onTap: () {
+                                  context.read<SyncCubit>().syncData();
+                                },
+                              ),
+                            ],
+                          ),
 
                           // Laundry Info Section
                           if (user != null && user.role == UserRole.owner)
@@ -641,10 +694,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => BlocProvider(
-                                        create: (_) => UserCubit(),
-                                        child: const UserManagementScreen(),
-                                      ),
+                                      builder: (_) => const UserManagementScreen(),
                                     ),
                                   );
                                 },

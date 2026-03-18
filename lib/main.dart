@@ -13,7 +13,8 @@ import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/sync/sync_cubit.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_cubit.dart';
 import 'package:kreatif_laundrymu_app/logic/cubits/printer/printer_cubit.dart';
-import 'package:kreatif_laundrymu_app/core/services/api_service.dart';
+import 'package:kreatif_laundrymu_app/logic/cubits/user/user_cubit.dart';
+import 'package:kreatif_laundrymu_app/core/api/api_service.dart';
 import 'package:kreatif_laundrymu_app/core/services/sync_service.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/auth/login_screen.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/main_screen.dart';
@@ -77,6 +78,7 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(create: (_) => SettingsCubit()..loadSettings()),
           BlocProvider(create: (_) => PrinterCubit()..initialize()),
+          BlocProvider(create: (_) => UserCubit()),
         ],
         child: MaterialApp(
           title: 'Laundry ',
