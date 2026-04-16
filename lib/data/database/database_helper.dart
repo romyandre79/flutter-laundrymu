@@ -18,8 +18,7 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, filePath);
+    final path = await getDbPath();
 
     return await openDatabase(
       path,
@@ -255,7 +254,9 @@ class DatabaseHelper {
 
   Future<String> getDbPath() async {
     final String dbPath;
-    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    if (Platform.isWindows) {
+      dbPath = dirname(Platform.resolvedExecutable);
+    } else if (Platform.isLinux || Platform.isMacOS) {
       final docsDir = await getApplicationDocumentsDirectory();
       dbPath = docsDir.path;
     } else {
@@ -265,8 +266,7 @@ class DatabaseHelper {
   }
 
   Future<void> deleteDatabase() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, AppConstants.databaseName);
+    final path = await getDbPath();
     await databaseFactory.deleteDatabase(path);
     _database = null;
   }
