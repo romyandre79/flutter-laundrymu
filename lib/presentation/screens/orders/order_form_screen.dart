@@ -35,6 +35,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   DateTime _dueDate = DateTime.now().add(const Duration(days: 3));
   PaymentMethod _paymentMethod = PaymentMethod.cash;
   bool _isLoading = false;
+  int _orderDiscount = 0;
 
   // Selected customer
   Customer? _selectedCustomer;
@@ -63,7 +64,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
         _items.removeAt(existing);
       } else {
         // Belum ada, tambahkan
-        _items.add(_OrderItemEntry(service: service));
+        final item = _OrderItemEntry(service: service);
+        if (_selectedCustomer != null) {
+          item.discount = ((service.price * _selectedCustomer!.defaultDiscount) / 100).round();
+          item.updateSubtotal();
+        }
+        _items.add(item);
       }
     });
   }
@@ -210,6 +216,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       _selectedCustomer = customer;
       _customerNameController.text = customer.name;
       _customerPhoneController.text = customer.phone ?? '';
+      
+      // Apply default discount to all items
+      for (var item in _items) {
+        item.discount = ((item.service.price * customer.defaultDiscount) / 100).round();
+        item.updateSubtotal();
+      }
     });
   }
 
@@ -218,6 +230,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       _selectedCustomer = null;
       _customerNameController.clear();
       _customerPhoneController.clear();
+
+      // Reset discount for all items
+      for (var item in _items) {
+        item.discount = 0;
+        item.updateSubtotal();
+      }
+      _orderDiscount = 0;
     });
   }
 
@@ -404,6 +423,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           createdBy: userId,
           initialPayment: payment,
           paymentMethod: _paymentMethod,
+          totalDiscount: _orderDiscount,
         );
   }
 
@@ -673,18 +693,34 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                 ),
                 child: Column(
                   children: [
+                    _buildSummaryRow('Total Nilai', _totalPrice),
+                    _buildSummaryRow(
+                      'Diskon Tambahan', 
+                      _orderDiscount,
+                      isClickable: true,
+                      onTap: _showOrderDiscountDialog,
+                    ),
+                    _buildSummaryRow(
+                      'Total Diskon', 
+                      _items.fold(0, (sum, item) => sum + (item.discount * item.quantity).round()) + _orderDiscount,
+                      color: AppThemeColors.error,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 4),
+                      child: Divider(height: 1),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Total',
+                          'Total Bayar',
                           style: GoogleFonts.poppins(
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          CurrencyFormatter.format(_totalPrice),
+                          CurrencyFormatter.format(_totalPrice - _orderDiscount),
                           style: GoogleFonts.poppins(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -970,6 +1006,30 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                           color: AppColors.textSecondary,
                         ),
                       ),
+                      if (item.discount > 0)
+                        InkWell(
+                          onTap: () => _showItemDiscountDialog(index, item),
+                          child: Text(
+                            'Diskon: -${CurrencyFormatter.format(item.discount)}',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: AppThemeColors.error,
+                              height: 1.5,
+                            ),
+                          ),
+                        )
+                      else
+                         InkWell(
+                          onTap: () => _showItemDiscountDialog(index, item),
+                          child: Text(
+                            'Tambah Diskon',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: AppThemeColors.primary,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
                     ],
                   ),
                 ),
@@ -1094,11 +1154,106 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       ),
     );
   }
+  Widget _buildSummaryRow(String label, int value, {Color? color, bool isClickable = false, VoidCallback? onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: InkWell(
+        onTap: onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label, 
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: isClickable ? AppThemeColors.primary : AppThemeColors.textSecondary,
+                decoration: isClickable ? TextDecoration.underline : null,
+              )
+            ),
+            Text(
+              CurrencyFormatter.format(value),
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: color ?? AppThemeColors.textPrimary,
+                fontWeight: color != null ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showItemDiscountDialog(int index, _OrderItemEntry item) {
+    final controller = TextEditingController(text: item.discount.toString());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Diskon ${item.service.name} (Rp)'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Masukkan nilai Rupiah',
+            prefixText: 'Rp ',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              final val = int.tryParse(controller.text) ?? 0;
+              setState(() {
+                _items[index].discount = val;
+                _items[index].updateSubtotal();
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOrderDiscountDialog() {
+    final controller = TextEditingController(text: _orderDiscount.toString());
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Diskon Tambahan Pesanan (Rp)'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          autofocus: true,
+          decoration: const InputDecoration(
+            hintText: 'Masukkan nilai Rupiah',
+            prefixText: 'Rp ',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () {
+              final val = int.tryParse(controller.text) ?? 0;
+              setState(() {
+                _orderDiscount = val;
+              });
+              Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _OrderItemEntry {
   final Service service;
   double quantity = 1;
+  int discount = 0;
   int subtotal;
 
   _OrderItemEntry({
@@ -1106,7 +1261,7 @@ class _OrderItemEntry {
   }) : subtotal = service.price;
 
   void updateSubtotal() {
-    subtotal = (service.price * quantity).round();
+    subtotal = ((service.price - discount) * quantity).round();
   }
 
   /// Format quantity display based on unit type

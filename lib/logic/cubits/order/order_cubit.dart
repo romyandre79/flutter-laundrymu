@@ -108,6 +108,7 @@ class OrderCubit extends Cubit<OrderState> {
     int? createdBy,
     int initialPayment = 0,
     PaymentMethod paymentMethod = PaymentMethod.cash,
+    int totalDiscount = 0,
   }) async {
     emit(const OrderLoading());
 
@@ -141,15 +142,17 @@ class OrderCubit extends Cubit<OrderState> {
         }
       }
 
-      // Calculate totals
-      int totalItems = items.length;
-      double totalWeight = 0;
-      int totalPrice = 0;
+      int totalGross = 0;
+      int itemDiscounts = 0;
 
       for (final item in items) {
         totalWeight += item.quantity;
-        totalPrice += item.subtotal;
+        totalGross += (item.pricePerUnit * item.quantity).round();
+        itemDiscounts += (item.discount * item.quantity).round();
       }
+
+      final combinedDiscount = itemDiscounts + totalDiscount;
+      totalPrice = totalGross - combinedDiscount;
 
       // Generate invoice
       final invoiceNo = await InvoiceGenerator.generate();
@@ -168,9 +171,9 @@ class OrderCubit extends Cubit<OrderState> {
         orderDate: DateTime.now(),
         dueDate: dueDate,
         status: OrderStatus.pending,
-        totalItems: totalItems,
         totalWeight: totalWeight,
         totalPrice: totalPrice,
+        totalDiscount: combinedDiscount,
         paid: paidAmount,
         notes: notes?.trim(),
         createdBy: createdBy,
