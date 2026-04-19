@@ -18,7 +18,8 @@ import 'package:kreatif_laundrymu_app/presentation/screens/services/service_list
 import 'package:kreatif_laundrymu_app/presentation/screens/customers/customer_list_screen.dart';
 import 'package:kreatif_laundrymu_app/presentation/screens/settings/printer_settings_screen.dart';
 import 'package:kreatif_laundrymu_app/data/services/database_service.dart';
-import 'package:kreatif_laundrymu_app/core/api/api_service.dart';
+import 'package:kreatif_laundrymu_app/core/services/session_service.dart';
+import 'package:kreatif_laundrymu_app/logic/sync/sync_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -355,8 +356,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _showServerUrlDialog() async {
-    final prefs = await SharedPreferences.getInstance();
-    final currentUrl = prefs.getString('api_base_url') ?? ApiConfig.baseUrl;
+    final session = await SessionService.getInstance();
+    final currentUrl = session.getBaseUrl() ?? ApiConfig.baseUrl;
     
     _showEditDialog(
       title: 'Server URL',
@@ -364,9 +365,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       hint: 'https://api.example.com',
       icon: Icons.cloud,
       onSave: (value) async {
-        await prefs.setString('api_base_url', value);
+        await session.setBaseUrl(value);
         if (mounted) {
-          context.read<ApiService>().setBaseUrl(value);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Server URL updated'),
@@ -420,6 +420,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             }
           },
         ),
+        BlocListener<SyncCubit, SyncState>(
+          listener: (context, state) {
+            if (state is SyncSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: AppThemeColors.success,
+                ),
+              );
+            } else if (state is SyncFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: AppThemeColors.error,
+                ),
+              );
+            }
+          },
+        ),
       ],
       child: Scaffold(
         backgroundColor: AppThemeColors.background,
@@ -465,13 +484,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 onTap: _showServerUrlDialog,
                               ),
                               _buildDivider(),
-                              _buildSettingTile(
-                                context: context,
-                                icon: Icons.sync,
-                                title: 'Sync Data',
-                                subtitle: 'Upload transaksi & download master data',
-                                onTap: () {
-                                  context.read<SyncCubit>().syncData();
+                              BlocBuilder<SyncCubit, SyncState>(
+                                builder: (context, state) {
+                                  final isLoading = state is SyncLoading;
+                                  return _buildSettingTile(
+                                    context: context,
+                                    icon: isLoading ? Icons.sync : Icons.cloud_sync,
+                                    title: 'Sinkronisasi Data',
+                                    subtitle: isLoading 
+                                        ? (state as SyncLoading).message 
+                                        : 'Upload transaksi & download master data',
+                                    onTap: isLoading ? null : () => context.read<SyncCubit>().syncData(),
+                                    trailing: isLoading 
+                                        ? const SizedBox(
+                                            width: 20, 
+                                            height: 20, 
+                                            child: CircularProgressIndicator(strokeWidth: 2)
+                                          )
+                                        : null,
+                                  );
                                 },
                               ),
                             ],
@@ -1046,6 +1077,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
     VoidCallback? onTap,
     bool showArrow = true,
+    Widget? trailing,
   }) {
     return Material(
       color: Colors.transparent,
@@ -1089,8 +1121,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
               ),
+              // Trailing widget
+              if (trailing != null) ...[
+                const SizedBox(width: AppSpacing.md),
+                trailing,
+              ],
               // Arrow or edit icon
-              if (showArrow && onTap != null)
+              if (showArrow && onTap != null && trailing == null)
                 Container(
                   width: 28,
                   height: 28,

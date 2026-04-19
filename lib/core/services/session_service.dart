@@ -6,6 +6,7 @@ class SessionService {
   static const String _keyUserRole = 'user_role';
   static const String _keyUserName = 'user_name';
   static const String _keyIsLoggedIn = 'is_logged_in';
+  static const String _keyBaseUrl = 'server_base_url';
 
   static SessionService? _instance;
   static SharedPreferences? _prefs;
@@ -82,7 +83,14 @@ class SessionService {
     await _prefs!.remove(_keyUserName);
     await _prefs!.setBool(_keyIsLoggedIn, false);
     await _prefs!.remove(_keySyncPassword);
+    await _prefs!.remove(_keyBaseUrl);
   }
+
+  Future<void> setBaseUrl(String url) async {
+    await _prefs!.setString(_keyBaseUrl, url);
+  }
+
+  String? getBaseUrl() => _prefs!.getString(_keyBaseUrl);
 
   /// Get all session data as Map
   Map<String, dynamic> getSessionData() {

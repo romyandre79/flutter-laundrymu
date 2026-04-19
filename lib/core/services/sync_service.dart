@@ -20,27 +20,25 @@ class SyncService {
         _dbHelper = dbHelper;
 
   Future<void> _ensureAuthenticated() async {
-    await _logService.log('SYNC', 'Starting authentication...');
     final session = await SessionService.getInstance();
+
+    final customUrl = session.getBaseUrl();
+    if (customUrl != null && customUrl.isNotEmpty) {
+      await _apiService.setBaseUrl(customUrl);
+    }
     
-    // Check if we have cached credentials
     if (!session.hasCachedCredentials()) {
-      await _logService.log('SYNC', 'ERROR: No cached credentials found. User needs to re-login.');
-      throw Exception('Sesi kadaluarsa. Silakan login ulang ke aplikasi untuk melakukan sinkronisasi.');
+      throw Exception('Sesi kadaluarsa. Silakan login ulang untuk sinkronisasi.');
     }
 
     final username = session.getUsername()!;
     final password = session.getCachedPassword()!;
-    await _logService.log('SYNC', 'Attempting server login for user: $username');
 
-    // Attempt login to server
     final token = await _apiService.login(username, password);
     
     if (token != null) {
-      _apiService.setAuthToken(token);
-      await _logService.log('SYNC', 'Authentication successful.');
+      await _apiService.setAuthToken(token);
     } else {
-      await _logService.log('SYNC', 'ERROR: Authentication failed. Server returned no token.');
       throw Exception('Gagal login ke server. Periksa koneksi internet atau kredensial Anda.');
     }
   }
@@ -51,14 +49,12 @@ class SyncService {
 
     final db = await _dbHelper.database;
     
-    // Get unsynced orders
     final List<Map<String, dynamic>> maps = await db.query(
       'orders',
       where: 'is_synced = ?',
       whereArgs: [0],
     );
 
-    await _logService.log('SYNC', 'Found ${maps.length} unsynced orders.');
     if (maps.isEmpty) return 0;
 
     int successCount = 0;
@@ -66,9 +62,7 @@ class SyncService {
     for (final map in maps) {
       try {
         final order = Order.fromMap(map);
-        await _logService.log('SYNC', 'Uploading order: ${map['invoice_no']}');
         
-        // Get order items
         final List<Map<String, dynamic>> itemMaps = await db.query(
           'order_items',
           where: 'order_id = ?',
@@ -76,11 +70,9 @@ class SyncService {
         );
         final items = itemMaps.map((e) => OrderItem.fromMap(e)).toList();
         
-        // Prepare payload
         final payload = order.toMap();
         payload['items'] = items.map((e) => e.toMap()).toList();
         
-        // Send to server using executeFlow
         final response = await _apiService.executeFlow('pos_sync_orders', 'pos', payload);
         
         if (response.data['code'] == 200) {
@@ -96,27 +88,22 @@ class SyncService {
             whereArgs: [order.id],
           );
           successCount++;
-          await _logService.log('SYNC', 'Order ${map['invoice_no']} synced successfully (server_id: $serverId)');
         }
       } catch (e) {
-        await _logService.log('SYNC', 'ERROR uploading order ${map['invoice_no']}: $e');
-        debugPrint('Error uploading order ${map['invoice_no']}: $e');
+        await _logService.log('SYNC_ERROR', 'Order ${map['invoice_no']}: $e');
       }
     }
 
-    await _logService.log('SYNC', 'Upload complete. $successCount/${maps.length} orders synced.');
     return successCount;
   }
 
-  // Download master data (Services, Customers)
+  // Download master data
   Future<void> downloadMasterData() async {
     await _ensureAuthenticated();
-    await _logService.log('SYNC', 'Starting master data download...');
     await _downloadServices();
     await _downloadCustomers();
-    await _logService.log('SYNC', 'Master data download complete.');
   }
-
+  
   Future<void> _downloadServices() async {
     try {
       final response = await _apiService.executeFlow('pos_get_products', 'pos', {});
@@ -127,49 +114,36 @@ class SyncService {
 
         await db.transaction((txn) async {
           for (final item in data) {
-            // Check if exists by server_id
             final List<Map<String, dynamic>> existing = await txn.query(
               'services',
               where: 'server_id = ?',
               whereArgs: [item['id']],
             );
 
-            // Robust parsing
             final price = int.tryParse(item['price'].toString()) ?? 0;
-            final durationDays = int.tryParse(item['duration_days'].toString()) ?? 3;
-            final isActive = (item['is_active'] == 1 || item['is_active'] == true);
+            final duration = int.tryParse(item['duration_days']?.toString() ?? '3') ?? 3;
 
             final service = Service(
               name: item['name'],
               unit: ServiceUnitExtension.fromString(item['unit'] ?? 'kg'),
               price: price,
-              durationDays: durationDays,
-              isActive: isActive,
-              // serverId: item['id'], // Need to add server_id to Service model
+              durationDays: duration,
+              isActive: (item['is_active']?.toString() ?? '1') == '1',
+              barcode: item['barcode'],
+              serverId: item['id'],
             );
-            
-            final serviceMap = service.toMap();
-            serviceMap['server_id'] = item['id'];
 
             if (existing.isNotEmpty) {
-              // Update
-              serviceMap.remove('id'); // Keep local ID
-              await txn.update(
-                'services',
-                serviceMap,
-                where: 'server_id = ?',
-                whereArgs: [item['id']],
-              );
+              final updateMap = service.toMap()..remove('id');
+              await txn.update('services', updateMap, where: 'server_id = ?', whereArgs: [item['id']]);
             } else {
-              // Insert
-              await txn.insert('services', serviceMap);
+              await txn.insert('services', service.toMap());
             }
           }
         });
       }
     } catch (e) {
-      debugPrint('Error downloading services: $e');
-      rethrow;
+      await _logService.log('SYNC_ERROR', 'Services: $e');
     }
   }
 
@@ -194,29 +168,20 @@ class SyncService {
               phone: item['phone'],
               address: item['address'],
               notes: item['notes'],
-              // serverId: item['id'], // Need to add server_id to Customer model
+              serverId: item['id'],
             );
-            
-            final customerMap = customer.toMap();
-            customerMap['server_id'] = item['id'];
 
             if (existing.isNotEmpty) {
-              customerMap.remove('id');
-              await txn.update(
-                'customers',
-                customerMap,
-                where: 'server_id = ?',
-                whereArgs: [item['id']],
-              );
+              final updateMap = customer.toMap()..remove('id');
+              await txn.update('customers', updateMap, where: 'server_id = ?', whereArgs: [item['id']]);
             } else {
-              await txn.insert('customers', customerMap);
+              await txn.insert('customers', customer.toMap());
             }
           }
         });
       }
     } catch (e) {
-      debugPrint('Error downloading customers: $e');
-      rethrow;
+      await _logService.log('SYNC_ERROR', 'Customers: $e');
     }
   }
 }

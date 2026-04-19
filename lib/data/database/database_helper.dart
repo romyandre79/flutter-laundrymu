@@ -61,6 +61,7 @@ class DatabaseHelper {
         total_spent INTEGER DEFAULT 0,
         last_order_date TEXT,
         default_discount REAL DEFAULT 0,
+        server_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
@@ -75,6 +76,8 @@ class DatabaseHelper {
         price INTEGER NOT NULL,
         duration_days INTEGER DEFAULT 3,
         is_active INTEGER DEFAULT 1,
+        barcode TEXT,
+        server_id INTEGER,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     ''');
@@ -97,6 +100,9 @@ class DatabaseHelper {
         paid INTEGER DEFAULT 0,
         notes TEXT,
         created_by INTEGER,
+        is_synced INTEGER DEFAULT 0,
+        server_id INTEGER,
+        plant_id INTEGER DEFAULT 0,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
         updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
@@ -251,6 +257,32 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE customers ADD COLUMN default_discount REAL DEFAULT 0');
       await db.execute('ALTER TABLE orders ADD COLUMN total_discount INTEGER DEFAULT 0');
       await db.execute('ALTER TABLE order_items ADD COLUMN discount INTEGER DEFAULT 0');
+    }
+      // Add barcode field to services
+      await db.execute('ALTER TABLE services ADD COLUMN barcode TEXT');
+    }
+    if (oldVersion < 8) {
+      // Standardize sync columns
+      final oColumns = await db.rawQuery('PRAGMA table_info(orders)');
+      if (!oColumns.any((c) => c['name'] == 'is_synced')) {
+        await db.execute('ALTER TABLE orders ADD COLUMN is_synced INTEGER DEFAULT 0');
+      }
+      if (!oColumns.any((c) => c['name'] == 'server_id')) {
+        await db.execute('ALTER TABLE orders ADD COLUMN server_id INTEGER');
+      }
+      if (!oColumns.any((c) => c['name'] == 'plant_id')) {
+        await db.execute('ALTER TABLE orders ADD COLUMN plant_id INTEGER DEFAULT 0');
+      }
+
+      final sColumns = await db.rawQuery('PRAGMA table_info(services)');
+      if (!sColumns.any((c) => c['name'] == 'server_id')) {
+        await db.execute('ALTER TABLE services ADD COLUMN server_id INTEGER');
+      }
+
+      final cColumns = await db.rawQuery('PRAGMA table_info(customers)');
+      if (!cColumns.any((c) => c['name'] == 'server_id')) {
+        await db.execute('ALTER TABLE customers ADD COLUMN server_id INTEGER');
+      }
     }
   }
 

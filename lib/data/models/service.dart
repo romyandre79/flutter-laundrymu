@@ -40,6 +40,8 @@ class Service extends Equatable {
   final int price;
   final int durationDays;
   final bool isActive;
+  final String? barcode;
+  final int? serverId;
   final DateTime? createdAt;
 
   const Service({
@@ -49,6 +51,8 @@ class Service extends Equatable {
     required this.price,
     this.durationDays = 3,
     this.isActive = true,
+    this.barcode,
+    this.serverId,
     this.createdAt,
   });
 
@@ -60,6 +64,8 @@ class Service extends Equatable {
       'price': price,
       'duration_days': durationDays,
       'is_active': isActive ? 1 : 0,
+      'barcode': barcode,
+      'server_id': serverId,
       'created_at': createdAt?.toIso8601String(),
     };
   }
@@ -72,6 +78,8 @@ class Service extends Equatable {
       price: map['price'] as int,
       durationDays: (map['duration_days'] as int?) ?? 3,
       isActive: (map['is_active'] as int?) == 1,
+      barcode: map['barcode'] as String?,
+      serverId: map['server_id'] as int?,
       createdAt: map['created_at'] != null
           ? DateTime.parse(map['created_at'] as String)
           : null,
@@ -85,6 +93,8 @@ class Service extends Equatable {
     int? price,
     int? durationDays,
     bool? isActive,
+    String? barcode,
+    int? serverId,
     DateTime? createdAt,
   }) {
     return Service(
@@ -94,6 +104,8 @@ class Service extends Equatable {
       price: price ?? this.price,
       durationDays: durationDays ?? this.durationDays,
       isActive: isActive ?? this.isActive,
+      barcode: barcode ?? this.barcode,
+      serverId: serverId ?? this.serverId,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -106,6 +118,8 @@ class Service extends Equatable {
         price,
         durationDays,
         isActive,
+        barcode,
+        serverId,
         createdAt,
       ];
 }
