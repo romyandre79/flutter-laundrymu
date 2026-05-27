@@ -1,42 +1,9 @@
 import 'package:equatable/equatable.dart';
 
-enum ServiceUnit { kg, pcs }
-
-extension ServiceUnitExtension on ServiceUnit {
-  String get value {
-    switch (this) {
-      case ServiceUnit.kg:
-        return 'kg';
-      case ServiceUnit.pcs:
-        return 'pcs';
-    }
-  }
-
-  String get displayName {
-    switch (this) {
-      case ServiceUnit.kg:
-        return 'Kilogram';
-      case ServiceUnit.pcs:
-        return 'Pieces';
-    }
-  }
-
-  static ServiceUnit fromString(String value) {
-    switch (value.toLowerCase()) {
-      case 'kg':
-        return ServiceUnit.kg;
-      case 'pcs':
-        return ServiceUnit.pcs;
-      default:
-        return ServiceUnit.kg;
-    }
-  }
-}
-
 class Service extends Equatable {
   final int? id;
   final String name;
-  final ServiceUnit unit;
+  final String unit;
   final int price;
   final int durationDays;
   final bool isActive;
@@ -60,7 +27,7 @@ class Service extends Equatable {
     return {
       'id': id,
       'name': name,
-      'unit': unit.value,
+      'unit': unit,
       'price': price,
       'duration_days': durationDays,
       'is_active': isActive ? 1 : 0,
@@ -74,7 +41,7 @@ class Service extends Equatable {
     return Service(
       id: map['id'] as int?,
       name: map['name'] as String,
-      unit: ServiceUnitExtension.fromString(map['unit'] as String),
+      unit: map['unit'] as String,
       price: map['price'] as int,
       durationDays: (map['duration_days'] as int?) ?? 3,
       isActive: (map['is_active'] as int?) == 1,
@@ -89,7 +56,7 @@ class Service extends Equatable {
   Service copyWith({
     int? id,
     String? name,
-    ServiceUnit? unit,
+    String? unit,
     int? price,
     int? durationDays,
     bool? isActive,

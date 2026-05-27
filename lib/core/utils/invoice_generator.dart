@@ -1,6 +1,6 @@
-import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
-import 'package:kreatif_laundrymu_app/core/utils/date_formatter.dart';
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/core/utils/date_formatter.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
 
 class InvoiceGenerator {
   /// Generate invoice number

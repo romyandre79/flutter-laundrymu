@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
-import 'package:kreatif_laundrymu_app/core/api/api_service.dart';
-import 'package:kreatif_laundrymu_app/core/services/log_service.dart';
-import 'package:kreatif_laundrymu_app/core/services/session_service.dart';
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/customer.dart';
-import 'package:kreatif_laundrymu_app/data/models/order.dart';
-import 'package:kreatif_laundrymu_app/data/models/order_item.dart';
-import 'package:kreatif_laundrymu_app/data/models/service.dart';
+import 'package:kreatif_laundry_app/core/api/api_service.dart';
+import 'package:kreatif_laundry_app/core/services/log_service.dart';
+import 'package:kreatif_laundry_app/core/services/session_service.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/customer.dart';
+import 'package:kreatif_laundry_app/data/models/order.dart';
+import 'package:kreatif_laundry_app/data/models/order_item.dart';
+import 'package:kreatif_laundry_app/data/models/service.dart';
 
 class SyncService {
   final ApiService _apiService;
@@ -125,7 +125,7 @@ class SyncService {
 
             final service = Service(
               name: item['name'],
-              unit: ServiceUnitExtension.fromString(item['unit'] ?? 'kg'),
+              unit: item['unit'] ?? 'kg',
               price: price,
               durationDays: duration,
               isActive: (item['is_active']?.toString() ?? '1') == '1',

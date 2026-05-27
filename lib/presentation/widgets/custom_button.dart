@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
 
 enum ButtonSize { small, medium, large }
 

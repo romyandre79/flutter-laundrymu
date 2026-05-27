@@ -1,9 +1,9 @@
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
-import 'package:kreatif_laundrymu_app/data/models/order.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/settings_repository.dart';
-import 'package:kreatif_laundrymu_app/core/utils/currency_formatter.dart';
-import 'package:kreatif_laundrymu_app/core/utils/date_formatter.dart';
-import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/data/models/order.dart';
+import 'package:kreatif_laundry_app/data/repositories/settings_repository.dart';
+import 'package:kreatif_laundry_app/core/utils/currency_formatter.dart';
+import 'package:kreatif_laundry_app/core/utils/date_formatter.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
 
 class LaundryPrint {
   LaundryPrint._init();
@@ -231,6 +231,36 @@ class LaundryPrint {
     );
 
     // ========== TOTAL ==========
+    // Subtotal (Gross)
+    bytes += generator.row([
+      PosColumn(
+        text: 'Subtotal',
+        width: 6,
+        styles: const PosStyles(align: PosAlign.left),
+      ),
+      PosColumn(
+        text: CurrencyFormatter.formatNoSymbol(order.subtotal),
+        width: 6,
+        styles: const PosStyles(align: PosAlign.right),
+      ),
+    ]);
+
+    // Discount (if any)
+    if (order.discount > 0) {
+      bytes += generator.row([
+        PosColumn(
+          text: 'Diskon',
+          width: 6,
+          styles: const PosStyles(align: PosAlign.left),
+        ),
+        PosColumn(
+          text: '-${CurrencyFormatter.formatNoSymbol(order.discount)}',
+          width: 6,
+          styles: const PosStyles(align: PosAlign.right),
+        ),
+      ]);
+    }
+
     bytes += generator.row([
       PosColumn(
         text: 'TOTAL',

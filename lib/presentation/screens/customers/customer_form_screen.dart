@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/data/models/customer.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_state.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/data/models/customer.dart';
+import 'package:kreatif_laundry_app/logic/cubits/customer/customer_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/customer/customer_state.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final Customer? customer;
@@ -410,6 +410,58 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
+      ),
+    );
+  }
+
+  Widget _buildDiscountCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: AppRadius.lgRadius,
+        boxShadow: AppShadows.card,
+      ),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Section Title
+          Row(
+            children: [
+              Container(
+                width: 4,
+                height: 20,
+                decoration: BoxDecoration(
+                  gradient: AppThemeColors.primaryGradient,
+                  borderRadius: AppRadius.fullRadius,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Text(
+                'Diskon Khusus',
+                style: AppTypography.titleSmall.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: AppSpacing.lg),
+
+          // Discount Field
+          _buildInputLabel('Diskon Default (%)'),
+          const SizedBox(height: AppSpacing.sm),
+          TextFormField(
+            controller: _defaultDiscountController,
+            style: AppTypography.bodyMedium,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            textInputAction: TextInputAction.done,
+            decoration: _buildInputDecoration(
+              hintText: 'Contoh: 10',
+              prefixIcon: Icons.percent_outlined,
+            ),
+          ),
+        ],
       ),
     );
   }

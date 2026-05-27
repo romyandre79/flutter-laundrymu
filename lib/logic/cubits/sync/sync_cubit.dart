@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:kreatif_laundrymu_app/core/api/api_service.dart';
-import 'package:kreatif_laundrymu_app/core/services/log_service.dart';
-import 'package:kreatif_laundrymu_app/core/services/sync_service.dart';
+import 'package:kreatif_laundry_app/core/api/api_service.dart';
+import 'package:kreatif_laundry_app/core/services/log_service.dart';
+import 'package:kreatif_laundry_app/core/services/sync_service.dart';
 
 part 'sync_state.dart';
 

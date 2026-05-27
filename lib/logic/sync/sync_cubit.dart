@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/core/services/sync_service.dart';
-import 'package:kreatif_laundrymu_app/logic/sync/sync_state.dart';
+import 'package:kreatif_laundry_app/core/services/sync_service.dart';
+import 'package:kreatif_laundry_app/logic/sync/sync_state.dart';
 
 class SyncCubit extends Cubit<SyncState> {
   final SyncService _syncService;

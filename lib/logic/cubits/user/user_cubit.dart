@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/data/models/user.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/user_repository.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/user/user_state.dart';
+import 'package:kreatif_laundry_app/data/models/user.dart';
+import 'package:kreatif_laundry_app/data/repositories/user_repository.dart';
+import 'package:kreatif_laundry_app/logic/cubits/user/user_state.dart';
 
 class UserCubit extends Cubit<UserState> {
   final UserRepository _userRepository;

@@ -1,7 +1,7 @@
-import 'package:kreatif_laundrymu_app/core/services/session_service.dart';
-import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/user.dart';
+import 'package:kreatif_laundry_app/core/services/session_service.dart';
+import 'package:kreatif_laundry_app/core/utils/password_helper.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/user.dart';
 
 class AuthRepository {
   final DatabaseHelper _databaseHelper;

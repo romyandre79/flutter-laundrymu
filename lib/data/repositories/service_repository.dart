@@ -1,5 +1,5 @@
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/service.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/service.dart';
 
 class ServiceRepository {
   final DatabaseHelper _databaseHelper;
@@ -55,7 +55,7 @@ class ServiceRepository {
     final now = DateTime.now().toIso8601String();
     final id = await db.insert('services', {
       'name': service.name.trim(),
-      'unit': service.unit.value,
+      'unit': service.unit,
       'price': service.price,
       'duration_days': service.durationDays,
       'is_active': 1,
@@ -90,7 +90,7 @@ class ServiceRepository {
       'services',
       {
         'name': service.name.trim(),
-        'unit': service.unit.value,
+        'unit': service.unit,
         'price': service.price,
         'duration_days': service.durationDays,
         'barcode': service.barcode,

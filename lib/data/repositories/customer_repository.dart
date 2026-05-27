@@ -1,5 +1,5 @@
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/customer.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/customer.dart';
 
 class CustomerRepository {
   final DatabaseHelper _databaseHelper;

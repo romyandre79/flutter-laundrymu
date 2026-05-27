@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/core/utils/invoice_generator.dart';
-import 'package:kreatif_laundrymu_app/data/models/order.dart';
-import 'package:kreatif_laundrymu_app/data/models/order_item.dart';
-import 'package:kreatif_laundrymu_app/data/models/payment.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/customer_repository.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/order_repository.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/payment_repository.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/order/order_state.dart';
+import 'package:kreatif_laundry_app/core/utils/invoice_generator.dart';
+import 'package:kreatif_laundry_app/data/models/order.dart';
+import 'package:kreatif_laundry_app/data/models/order_item.dart';
+import 'package:kreatif_laundry_app/data/models/payment.dart';
+import 'package:kreatif_laundry_app/data/repositories/customer_repository.dart';
+import 'package:kreatif_laundry_app/data/repositories/order_repository.dart';
+import 'package:kreatif_laundry_app/data/repositories/payment_repository.dart';
+import 'package:kreatif_laundry_app/logic/cubits/order/order_state.dart';
 
 class OrderCubit extends Cubit<OrderState> {
   final OrderRepository _orderRepository;
@@ -144,11 +144,13 @@ class OrderCubit extends Cubit<OrderState> {
 
       int totalGross = 0;
       int itemDiscounts = 0;
+      double totalWeight = 0;
+      int totalPrice = 0;
 
       for (final item in items) {
         totalWeight += item.quantity;
         totalGross += (item.pricePerUnit * item.quantity).round();
-        itemDiscounts += (item.discount * item.quantity).round();
+        itemDiscounts += item.discount;
       }
 
       final combinedDiscount = itemDiscounts + totalDiscount;
@@ -157,10 +159,8 @@ class OrderCubit extends Cubit<OrderState> {
       // Generate invoice
       final invoiceNo = await InvoiceGenerator.generate();
 
-      // Hitung kembalian (jika bayar lebih dari total)
-      final change = initialPayment > totalPrice ? initialPayment - totalPrice : 0;
-      // Yang dicatat sebagai "paid" di order adalah maksimal = totalPrice
-      final paidAmount = initialPayment > totalPrice ? totalPrice : initialPayment;
+      // Yang dicatat sebagai "paid" di order adalah jumlah yang diterima
+      final paidAmount = initialPayment;
 
       // Create order
       final order = Order(
@@ -182,6 +182,9 @@ class OrderCubit extends Cubit<OrderState> {
       // Prepare initial payment if any
       Payment? payment;
       if (initialPayment > 0) {
+        // Hitung kembalian untuk pembayaran awal
+        final change = initialPayment > totalPrice ? initialPayment - totalPrice : 0;
+
         payment = Payment(
           orderId: 0, // Will be set after order creation
           amount: initialPayment, // Simpan jumlah bayar apa adanya

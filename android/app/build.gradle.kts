@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kreatif.laundrymu"
+    namespace = "com.kreatif.laundry"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.kreatif.laundrymu"
+        applicationId = "com.kreatif.laundry"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -41,7 +41,7 @@ android {
     applicationVariants.all {
         outputs.all {
             val output = this as com.android.build.gradle.internal.api.ApkVariantOutputImpl
-            output.outputFileName = "kreatif-laundrymu.apk"
+            output.outputFileName = "kreatif-laundry.apk"
         }
     }
 }

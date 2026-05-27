@@ -502,7 +502,7 @@ flutter run
 
 Format: `com.company.appname`
 
-Contoh: `com.kreatif.laundrymu`
+Contoh: `com.kreatif.laundry`
 
 **Aturan:**
 - Hanya huruf kecil, angka, dan titik

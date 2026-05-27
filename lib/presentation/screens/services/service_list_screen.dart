@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/core/utils/currency_formatter.dart';
-import 'package:kreatif_laundrymu_app/data/models/service.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_state.dart';
-import 'package:kreatif_laundrymu_app/presentation/screens/services/service_form_screen.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/core/utils/currency_formatter.dart';
+import 'package:kreatif_laundry_app/data/models/service.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_state.dart';
+import 'package:kreatif_laundry_app/presentation/screens/services/service_form_screen.dart';
 
 class ServiceListScreen extends StatefulWidget {
   const ServiceListScreen({super.key});
@@ -345,7 +345,7 @@ class _ServiceListScreenState extends State<ServiceListScreen> {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            '/ ${service.unit.value}',
+                            '/ ${service.unit}',
                             style: AppTypography.bodySmall.copyWith(
                               color: AppThemeColors.textSecondary,
                             ),

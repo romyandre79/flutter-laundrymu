@@ -1,5 +1,5 @@
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/payment.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/payment.dart';
 
 class PaymentRepository {
   final DatabaseHelper _databaseHelper;

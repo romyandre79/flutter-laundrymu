@@ -2,13 +2,14 @@ class AppConstants {
   AppConstants._();
 
   // App Info
-  static const String appName = 'Kreatif Laundry';
+  static const String appName = 'kreatif Laundry';
   static const String appVersion = '1.0.0';
-  static const String appDescription = 'Aplikasi Kreatif Laundry - Full Offline, Jalan Tanpa Internet!';
+  static const String appDescription = 'Aplikasi kreatif Laundry - Full Offline, Jalan Tanpa Internet!';
+  static const String copyRight = '© 2026 Prisma Data Abadi for kreatif Indonesia. All rights reserved.';
 
   // Database
   static const String databaseName = 'laundryfull.db';
-  static const int databaseVersion = 8;
+  static const int databaseVersion = 10;
 
   // Invoice
   static const String defaultInvoicePrefix = 'LNDR';
@@ -57,7 +58,7 @@ class AppConstants {
   static const String keyLastInvoiceNumber = 'last_invoice_number';
 
   // Default Laundry Info
-  static const String defaultLaundryName = 'Kreatif Laundry';
+  static const String defaultLaundryName = 'kreatif Laundry';
   static const String defaultLaundryAddress = 'Jalan Mrutu Kalianyar 1c Surabaya';
   static const String defaultLaundryPhone = '6281932701147';
   static const String defaultPlantId = '1';
@@ -69,4 +70,6 @@ class AppConstants {
   static const String keyBaseUrl = 'base_url';
   static const String keyFonnteToken = 'fonnte_token';
   static const String defaultFonnteToken = '081932701147';
+
+  static const bool isDemoMode = true;
 }

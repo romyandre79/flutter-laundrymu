@@ -1,8 +1,11 @@
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
-import 'package:kreatif_laundrymu_app/data/models/order.dart';
-import 'package:kreatif_laundrymu_app/data/models/order_item.dart';
-import 'package:kreatif_laundrymu_app/data/models/payment.dart';
-import 'package:kreatif_laundrymu_app/data/repositories/customer_repository.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/core/exceptions/database_exception.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/models/order.dart';
+import 'package:kreatif_laundry_app/data/models/order_item.dart';
+import 'package:kreatif_laundry_app/data/models/payment.dart';
+import 'package:kreatif_laundry_app/data/repositories/customer_repository.dart';
+import 'package:sqflite/sqflite.dart';
 
 class OrderRepository {
   final DatabaseHelper _databaseHelper;
@@ -83,6 +86,15 @@ class OrderRepository {
     Payment? initialPayment,
   }) async {
     final db = await _databaseHelper.database;
+    
+    // Check demo mode limit
+    if (AppConstants.isDemoMode) {
+      final orderCountResult = await db.rawQuery('SELECT COUNT(*) as count FROM orders');
+      final totalOrders = Sqflite.firstIntValue(orderCountResult) ?? 0;
+      if (totalOrders >= 5) {
+        throw ValidationException('Demo Mode: Transaksi dibatasi maksimal 5.');
+      }
+    }
 
     // Auto-save customer if phone is provided (before transaction)
     int? customerId = order.customerId;
@@ -285,5 +297,35 @@ class OrderRepository {
       where: 'id = ?',
       whereArgs: [orderId],
     );
+  }
+
+  /// Get today's total sales (Accrual Basis)
+  Future<int> getTodaySales() async {
+    final db = await _databaseHelper.database;
+    final today = DateTime.now();
+    final startOfDay = DateTime(today.year, today.month, today.day).toIso8601String();
+    final endOfDay = DateTime(today.year, today.month, today.day, 23, 59, 59).toIso8601String();
+
+    final result = await db.rawQuery(
+      'SELECT SUM(total_price) as total FROM orders WHERE DATE(order_date) BETWEEN DATE(?) AND DATE(?)',
+      [startOfDay, endOfDay],
+    );
+
+    return (result.first['total'] as int?) ?? 0;
+  }
+
+  /// Get this month's total sales (Accrual Basis)
+  Future<int> getThisMonthSales() async {
+    final db = await _databaseHelper.database;
+    final now = DateTime.now();
+    final startOfMonth = DateTime(now.year, now.month, 1).toIso8601String();
+    final endOfMonth = DateTime(now.year, now.month + 1, 0, 23, 59, 59).toIso8601String();
+
+    final result = await db.rawQuery(
+      'SELECT SUM(total_price) as total FROM orders WHERE DATE(order_date) BETWEEN DATE(?) AND DATE(?)',
+      [startOfMonth, endOfMonth],
+    );
+
+    return (result.first['total'] as int?) ?? 0;
   }
 }

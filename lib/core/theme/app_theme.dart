@@ -1,65 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Design System Colors (Blue Theme - RAFA Laundry)
+/// Design System Colors
 class AppThemeColors {
   AppThemeColors._();
 
-  // Primary Blue Palette (Menyesuaikan Logo)
-  static const Color primary = Color(0xFF1565C0);       // Deep Blue
-  static const Color primaryLight = Color(0xFF42A5F5);  // Sky Blue
-  static const Color primaryDark = Color(0xFF0D47A1);   // Navy Dark
-  static const Color primarySurface = Color(0xFFE3F2FD); // Very Light Blue
+  // Primary Blue Palette
+  static const Color primary = Color(0xFF2196F3); // Blue 500
+  static const Color primaryLight = Color(0xFF64B5F6); // Blue 300
+  static const Color primaryDark = Color(0xFF1976D2); // Blue 700
+  static const Color primarySurface = Color(0xFFE3F2FD); // Blue 50
 
-  // Secondary Colors
-  static const Color secondary = Color(0xFF29B6F6);     // Bright Blue
-  static const Color secondaryLight = Color(0xFFE1F5FE);
+  // Secondary Colors (Complementary or Neutral)
+  static const Color secondary = Color(0xFF90CAF9); // Blue 200
+  static const Color secondaryLight = Color(0xFFBBDEFB); // Blue 100
 
   // Background Colors
-  static const Color background = Color(0xFFF5FAFF); // Soft Blue Tint
+  static const Color background = Color(0xFFF5F5F5); // Grey 100 / Neutral
   static const Color surface = Colors.white;
   static const Color cardBackground = Colors.white;
 
   // Text Colors
-  static const Color textPrimary = Color(0xFF0D47A1); // Navy Text
-  static const Color textSecondary = Color(0xFF1976D2);
-  static const Color textHint = Color(0xFF9E9E9E);
+  static const Color textPrimary = Color(0xFF0D47A1); // Dark Blue Text (Blue 900)
+  static const Color textSecondary = Color(0xFF1976D2); // Medium Blue Text (Blue 700)
+  static const Color textHint = Color(0xFF90CAF9);
   static const Color textOnPrimary = Colors.white;
 
   // Status Colors
-  static const Color success = Color(0xFF2E7D32);
-  static const Color warning = Color(0xFFFFA000);
-  static const Color error = Color(0xFFD32F2F);
-  static const Color info = Color(0xFF0288D1);
+  static const Color success = Color(0xFF4CAF50);
+  static const Color warning = Color(0xFFFF9800);
+  static const Color error = Color(0xFFF44336);
+  static const Color info = Color(0xFF2196F3);
   static const Color completed = Color(0xFF607D8B);
 
   // Neutral Colors
-  static const Color border = Color(0xFFBBDEFB);
-  static const Color divider = Color(0xFFE3F2FD);
+  static const Color border = Color(0xFFBBDEFB); // Blue 100
+  static const Color divider = Color(0xFFE3F2FD); // Blue 50
   static const Color disabled = Color(0xFFBDBDBD);
   static const Color shimmer = Color(0xFFEEEEEE);
-  static const Color inputFill = Color(0xFFF8FBFF);
+  static const Color inputFill = Color(0xFFFAFAFA);
 
-  // Gradient (Sesuai Logo)
+  // Gradient
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [
-      Color(0xFF42A5F5),
-      Color(0xFF1565C0),
-    ],
+    colors: [Color(0xFF42A5F5), Color(0xFF1E88E5)],
   );
 
   static const LinearGradient headerGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF1E88E5),
-      Color(0xFF0D47A1),
-    ],
+    colors: [Color(0xFF42A5F5), Color(0xFF1E88E5)],
   );
 }
-
 
 /// Design System Spacing
 class AppSpacing {

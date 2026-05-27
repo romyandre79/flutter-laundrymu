@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
 import 'package:share_plus/share_plus.dart';
 
 class DatabaseService {

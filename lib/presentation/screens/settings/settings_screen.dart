@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:kreatif_laundrymu_app/core/api/api_config.dart';
-import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/data/models/user.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/settings/settings_state.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/user/user_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/sync/sync_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_cubit.dart';
-import 'package:kreatif_laundrymu_app/presentation/screens/settings/user_management_screen.dart';
-import 'package:kreatif_laundrymu_app/presentation/screens/services/service_list_screen.dart';
-import 'package:kreatif_laundrymu_app/presentation/screens/customers/customer_list_screen.dart';
-import 'package:kreatif_laundrymu_app/presentation/screens/settings/printer_settings_screen.dart';
-import 'package:kreatif_laundrymu_app/data/services/database_service.dart';
-import 'package:kreatif_laundrymu_app/core/services/session_service.dart';
-import 'package:kreatif_laundrymu_app/logic/sync/sync_state.dart';
+import 'package:kreatif_laundry_app/core/api/api_config.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/data/models/user.dart';
+import 'package:kreatif_laundry_app/logic/cubits/auth/auth_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/auth/auth_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/settings/settings_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/settings/settings_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/user/user_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/sync/sync_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/customer/customer_cubit.dart';
+import 'package:kreatif_laundry_app/presentation/screens/settings/user_management_screen.dart';
+import 'package:kreatif_laundry_app/presentation/screens/services/service_list_screen.dart';
+import 'package:kreatif_laundry_app/presentation/screens/customers/customer_list_screen.dart';
+import 'package:kreatif_laundry_app/presentation/screens/settings/printer_settings_screen.dart';
+import 'package:kreatif_laundry_app/presentation/screens/unit/unit_list_screen.dart';
+import 'package:kreatif_laundry_app/logic/cubits/unit/unit_cubit.dart';
+import 'package:kreatif_laundry_app/data/services/database_service.dart';
+import 'package:kreatif_laundry_app/core/services/session_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
@@ -114,7 +115,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildAboutRow('Creator', 'Kreatif'),
+            _buildAboutRow('Creator', 'kreatif'),
             const SizedBox(height: AppSpacing.md),
             _buildAboutRow('PhoneNo', '081932701147'),
             const SizedBox(height: AppSpacing.md),
@@ -422,17 +423,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         BlocListener<SyncCubit, SyncState>(
           listener: (context, state) {
-            if (state is SyncSuccess) {
+            if (state is SyncCompleted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
+                const SnackBar(
+                  content: Text('Sinkronisasi berhasil'),
                   backgroundColor: AppThemeColors.success,
                 ),
               );
-            } else if (state is SyncFailure) {
+            } else if (state is SyncFailed) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.error),
+                  content: Text(state.message),
                   backgroundColor: AppThemeColors.error,
                 ),
               );
@@ -486,13 +487,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               _buildDivider(),
                               BlocBuilder<SyncCubit, SyncState>(
                                 builder: (context, state) {
-                                  final isLoading = state is SyncLoading;
+                                  final isLoading = state is Syncing;
                                   return _buildSettingTile(
                                     context: context,
                                     icon: isLoading ? Icons.sync : Icons.cloud_sync,
                                     title: 'Sinkronisasi Data',
-                                    subtitle: isLoading 
-                                        ? (state as SyncLoading).message 
+                                    subtitle: isLoading
+                                        ? 'Sedang sinkronisasi...'
                                         : 'Upload transaksi & download master data',
                                     onTap: isLoading ? null : () => context.read<SyncCubit>().syncData(),
                                     trailing: isLoading 
@@ -642,6 +643,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       builder: (_) => BlocProvider(
                                         create: (_) => CustomerCubit(),
                                         child: const CustomerListScreen(),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                              _buildDivider(),
+                              _buildSettingTile(
+                                context: context,
+                                icon: Icons.straighten,
+                                title: 'Master Satuan',
+                                subtitle: 'Kelola satuan (kg, pcs, dll)',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => BlocProvider(
+                                        create: (_) => UnitCubit(),
+                                        child: const UnitListScreen(),
                                       ),
                                     ),
                                   );

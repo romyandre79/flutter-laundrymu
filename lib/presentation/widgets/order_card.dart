@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/core/utils/currency_formatter.dart';
-import 'package:kreatif_laundrymu_app/core/utils/date_formatter.dart';
-import 'package:kreatif_laundrymu_app/data/models/order.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/core/utils/currency_formatter.dart';
+import 'package:kreatif_laundry_app/core/utils/date_formatter.dart';
+import 'package:kreatif_laundry_app/data/models/order.dart';
 
 class OrderCard extends StatelessWidget {
   final Order order;

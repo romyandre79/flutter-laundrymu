@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kreatif_laundrymu_app/core/constants/colors.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/core/utils/currency_formatter.dart';
-import 'package:kreatif_laundrymu_app/core/utils/thousand_separator_formatter.dart';
-import 'package:kreatif_laundrymu_app/data/models/customer.dart';
-import 'package:kreatif_laundrymu_app/data/models/order_item.dart';
-import 'package:kreatif_laundrymu_app/data/models/payment.dart';
-import 'package:kreatif_laundrymu_app/data/models/service.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/auth/auth_state.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/customer/customer_state.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/order/order_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/order/order_state.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_state.dart';
+import 'package:kreatif_laundry_app/core/constants/colors.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/core/utils/currency_formatter.dart';
+import 'package:kreatif_laundry_app/core/utils/thousand_separator_formatter.dart';
+import 'package:kreatif_laundry_app/data/models/customer.dart';
+import 'package:kreatif_laundry_app/data/models/order_item.dart';
+import 'package:kreatif_laundry_app/data/models/payment.dart';
+import 'package:kreatif_laundry_app/data/models/service.dart';
+import 'package:kreatif_laundry_app/logic/cubits/auth/auth_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/auth/auth_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/unit/unit_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/unit/unit_state.dart';
+import 'package:kreatif_laundry_app/data/models/unit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/customer/customer_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/customer/customer_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/order/order_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/order/order_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_state.dart';
+import 'package:kreatif_laundry_app/presentation/widgets/searchable_customer_picker.dart';
 
 class OrderFormScreen extends StatefulWidget {
   const OrderFormScreen({super.key});
@@ -90,7 +94,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   void _showQuantityInputDialog(int index, _OrderItemEntry item) {
-    final isKg = item.service.unit == ServiceUnit.kg;
+    final isKg = item.service.unit.toLowerCase() == 'kg';
     final controller = TextEditingController(text: item.quantityDisplay);
 
     showDialog(
@@ -120,7 +124,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                   ? const TextInputType.numberWithOptions(decimal: true)
                   : TextInputType.number,
               decoration: InputDecoration(
-                suffixText: item.service.unit.value,
+                suffixText: item.service.unit,
                 hintText: isKg ? 'Contoh: 1.5' : 'Contoh: 3',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
@@ -173,7 +177,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   void _submitQuantityInput(
       BuildContext dialogContext, String input, int index, _OrderItemEntry item) {
-    final isKg = item.service.unit == ServiceUnit.kg;
+    final isKg = item.service.unit.toLowerCase() == 'kg';
     // Replace comma with dot for decimal parsing
     final normalizedInput = input.replaceAll(',', '.');
     final parsed = double.tryParse(normalizedInput);
@@ -240,23 +244,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       }
       _orderDiscount = 0;
     });
-  }
-
-  void _showCustomerSearchDialog() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (bottomSheetContext) => BlocProvider.value(
-        value: context.read<CustomerCubit>()..loadCustomers(),
-        child: _CustomerSearchSheet(
-          onCustomerSelected: (customer) {
-            Navigator.pop(bottomSheetContext);
-            _selectCustomer(customer);
-          },
-        ),
-      ),
-    );
   }
 
   void _handleSubmit() {
@@ -407,7 +394,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               serviceId: e.service.id,
               serviceName: e.service.name,
               quantity: e.quantity.toDouble(),
-              unit: e.service.unit.value,
+              unit: e.service.unit,
               pricePerUnit: e.service.price,
               subtotal: e.subtotal,
             ))
@@ -469,75 +456,24 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
               _buildSectionTitle('Informasi Pelanggan'),
               const SizedBox(height: 12),
 
-              // Customer selection card
-              if (_selectedCustomer != null) ...[
-                _buildSelectedCustomerCard(),
-                const SizedBox(height: 12),
-              ] else ...[
-                // Search existing customer button
-                InkWell(
-                  onTap: _showCustomerSearchDialog,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppThemeColors.primarySurface,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: AppThemeColors.primary.withValues(alpha: 0.3),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: AppThemeColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.person_search,
-                            color: AppThemeColors.primary,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Pilih Pelanggan',
-                                style: GoogleFonts.poppins(
-                                  fontWeight: FontWeight.w500,
-                                  color: AppThemeColors.primary,
-                                ),
-                              ),
-                              Text(
-                                'Cari dari daftar pelanggan',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 12,
-                                  color: AppThemeColors.textSecondary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_forward_ios,
-                          color: AppThemeColors.primary,
-                          size: 16,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              SearchableCustomerPicker(
+                selectedCustomer: _selectedCustomer,
+                onCustomerSelected: (customer) {
+                  if (customer != null) {
+                    _selectCustomer(customer);
+                  } else {
+                    _clearSelectedCustomer();
+                  }
+                },
+                hint: 'Cari dari daftar pelanggan...',
+              ),
 
+              if (_selectedCustomer == null) ...[
                 const SizedBox(height: 16),
-
                 // Divider with "atau"
                 Row(
                   children: [
-                    Expanded(child: Divider(color: AppThemeColors.border)),
+                    const Expanded(child: Divider()),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
@@ -548,12 +484,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         ),
                       ),
                     ),
-                    Expanded(child: Divider(color: AppThemeColors.border)),
+                    const Expanded(child: Divider()),
                   ],
                 ),
-
-                const SizedBox(height: 16),
               ],
+              
+              const SizedBox(height: 16),
 
               TextFormField(
                 controller: _customerNameController,
@@ -847,6 +783,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
         ],
       ),
     );
+  }
+
   Widget _buildServiceSelector() {
     return BlocBuilder<ServiceCubit, ServiceState>(
       builder: (context, state) {
@@ -954,32 +892,45 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                              'per ${service.unit.value}',
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    service.name,
+                                    style: GoogleFonts.poppins(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  Text(
+                                    'per ${service.unit}',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 12,
+                                      color: AppThemeColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Price
+                            Text(
+                              CurrencyFormatter.format(service.price),
                               style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: AppThemeColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                                color: AppThemeColors.primary,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      // Price
-                      Text(
-                        CurrencyFormatter.format(service.price),
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w600,
-                          color: AppThemeColors.primary,
-                        ),
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        );
-      },
-    );
+              ),
+            ],
+          );
+        },
+      );
   }
 
   Widget _buildItemCard(int index, _OrderItemEntry item) {
@@ -1007,7 +958,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${CurrencyFormatter.format(item.service.price)}/${item.service.unit.value}',
+                        '${CurrencyFormatter.format(item.service.price)}/${item.service.unit}',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -1073,7 +1024,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                       ),
                     ),
                     Text(
-                      '${item.quantityDisplay} ${item.service.unit.value}',
+                      '${item.quantityDisplay} ${item.service.unit}',
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         color: AppThemeColors.textSecondary,
@@ -1090,7 +1041,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   Widget _buildQuantityControls(int index, _OrderItemEntry item) {
-    final isKg = item.service.unit == ServiceUnit.kg;
+    final isKg = item.service.unit.toLowerCase() == 'kg';
     final step = isKg ? 0.5 : 1.0;
     final minQuantity = isKg ? 0.5 : 1.0;
 
@@ -1273,7 +1224,7 @@ class _OrderItemEntry {
 
   /// Format quantity display based on unit type
   String get quantityDisplay {
-    if (service.unit == ServiceUnit.pcs) {
+    if (service.unit.toLowerCase() == 'pcs') {
       return quantity.toInt().toString();
     } else {
       // For kg, show decimal if needed
@@ -1284,217 +1235,4 @@ class _OrderItemEntry {
   }
 }
 
-// Customer Search Bottom Sheet
-class _CustomerSearchSheet extends StatefulWidget {
-  final Function(Customer) onCustomerSelected;
 
-  const _CustomerSearchSheet({required this.onCustomerSelected});
-
-  @override
-  State<_CustomerSearchSheet> createState() => _CustomerSearchSheetState();
-}
-
-class _CustomerSearchSheetState extends State<_CustomerSearchSheet> {
-  final TextEditingController _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _performSearch(String query) {
-    if (query.isEmpty) {
-      context.read<CustomerCubit>().loadCustomers();
-    } else {
-      context.read<CustomerCubit>().searchCustomers(query);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppThemeColors.border,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-
-          // Header
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Text(
-                  'Pilih Pelanggan',
-                  style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-          ),
-
-          // Search field
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Cari nama atau nomor HP...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          _searchController.clear();
-                          _performSearch('');
-                          setState(() {});
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppThemeColors.background,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-              onChanged: (value) {
-                setState(() {});
-                _performSearch(value);
-              },
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Customer list
-          Expanded(
-            child: BlocBuilder<CustomerCubit, CustomerState>(
-              builder: (context, state) {
-                final customers = context.read<CustomerCubit>().customers;
-
-                if (state is CustomerLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppThemeColors.primary,
-                    ),
-                  );
-                }
-
-                if (customers.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person_off_outlined,
-                          size: 48,
-                          color: AppThemeColors.textSecondary.withValues(alpha: 0.5),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _searchController.text.isEmpty
-                              ? 'Belum ada pelanggan'
-                              : 'Pelanggan tidak ditemukan',
-                          style: GoogleFonts.poppins(
-                            color: AppThemeColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: customers.length,
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1,
-                    color: AppThemeColors.border,
-                  ),
-                  itemBuilder: (context, index) {
-                    final customer = customers[index];
-                    return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      leading: CircleAvatar(
-                        backgroundColor: AppThemeColors.primary.withValues(alpha: 0.1),
-                        child: Text(
-                          customer.name.isNotEmpty
-                              ? customer.name[0].toUpperCase()
-                              : '?',
-                          style: GoogleFonts.poppins(
-                            fontWeight: FontWeight.w600,
-                            color: AppThemeColors.primary,
-                          ),
-                        ),
-                      ),
-                      title: Text(
-                        customer.name,
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      subtitle: customer.phone != null && customer.phone!.isNotEmpty
-                          ? Text(
-                              customer.phone!,
-                              style: GoogleFonts.poppins(
-                                fontSize: 12,
-                                color: AppThemeColors.textSecondary,
-                              ),
-                            )
-                          : null,
-                      trailing: customer.totalOrders > 0
-                          ? Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppThemeColors.success.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Text(
-                                '${customer.totalOrders} order',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: AppThemeColors.success,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            )
-                          : null,
-                      onTap: () => widget.onCustomerSelected(customer),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

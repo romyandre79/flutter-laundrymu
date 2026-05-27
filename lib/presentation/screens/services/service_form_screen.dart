@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kreatif_laundrymu_app/core/theme/app_theme.dart';
-import 'package:kreatif_laundrymu_app/core/utils/thousand_separator_formatter.dart';
-import 'package:kreatif_laundrymu_app/data/models/service.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_cubit.dart';
-import 'package:kreatif_laundrymu_app/logic/cubits/service/service_state.dart';
+import 'package:kreatif_laundry_app/core/theme/app_theme.dart';
+import 'package:kreatif_laundry_app/core/utils/thousand_separator_formatter.dart';
+import 'package:kreatif_laundry_app/data/models/service.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/service/service_state.dart';
+import 'package:kreatif_laundry_app/logic/cubits/unit/unit_cubit.dart';
+import 'package:kreatif_laundry_app/logic/cubits/unit/unit_state.dart';
+import 'package:kreatif_laundry_app/presentation/widgets/searchable_unit_picker.dart';
+import 'package:kreatif_laundry_app/data/models/unit.dart';
 
 class ServiceFormScreen extends StatefulWidget {
   final Service? service;
@@ -22,7 +26,7 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
   final _priceController = TextEditingController();
   final _durationController = TextEditingController();
   final _barcodeController = TextEditingController();
-  ServiceUnit _selectedUnit = ServiceUnit.kg;
+  String _selectedUnit = 'kg';
   bool _isLoading = false;
 
   bool get isEditing => widget.service != null;
@@ -298,9 +302,12 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
           const SizedBox(height: AppSpacing.lg),
 
           // Unit Selection
-          _buildInputLabel('Satuan', isRequired: true),
-          const SizedBox(height: AppSpacing.sm),
-          _buildUnitSelector(),
+          SearchableUnitPicker(
+            label: 'Satuan',
+            selectedUnit: _selectedUnit,
+            onUnitSelected: (val) => setState(() => _selectedUnit = val),
+            validator: (val) => val == null || val.isEmpty ? 'Pilih satuan' : null,
+          ),
 
           const SizedBox(height: AppSpacing.lg),
 
@@ -449,122 +456,6 @@ class _ServiceFormScreenState extends State<ServiceFormScreen> {
       contentPadding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.md,
-      ),
-    );
-  }
-
-  Widget _buildUnitSelector() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildUnitOption(
-            unit: ServiceUnit.kg,
-            label: 'Kilogram',
-            sublabel: 'per kg',
-            icon: Icons.scale,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _buildUnitOption(
-            unit: ServiceUnit.pcs,
-            label: 'Per Item',
-            sublabel: 'per pcs',
-            icon: Icons.checkroom,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUnitOption({
-    required ServiceUnit unit,
-    required String label,
-    required String sublabel,
-    required IconData icon,
-  }) {
-    final isSelected = _selectedUnit == unit;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedUnit = unit;
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppThemeColors.primary.withValues(alpha: 0.1)
-              : Colors.white,
-          borderRadius: AppRadius.mdRadius,
-          border: Border.all(
-            color: isSelected ? AppThemeColors.primary : AppThemeColors.border,
-            width: isSelected ? 2 : 1,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppThemeColors.primary.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          children: [
-            // Icon
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: isSelected ? AppThemeColors.primaryGradient : null,
-                color: isSelected ? null : AppThemeColors.background,
-                borderRadius: AppRadius.mdRadius,
-              ),
-              child: Icon(
-                icon,
-                color: isSelected ? Colors.white : AppThemeColors.textHint,
-                size: 24,
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.sm),
-
-            // Label
-            Text(
-              label,
-              style: AppTypography.labelMedium.copyWith(
-                color: isSelected
-                    ? AppThemeColors.primary
-                    : AppThemeColors.textSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-
-            // Sublabel
-            Text(
-              sublabel,
-              style: AppTypography.labelSmall.copyWith(
-                color: isSelected
-                    ? AppThemeColors.primary.withValues(alpha: 0.7)
-                    : AppThemeColors.textHint,
-              ),
-            ),
-
-            // Check icon
-            if (isSelected) ...[
-              const SizedBox(height: AppSpacing.xs),
-              const Icon(
-                Icons.check_circle,
-                color: AppThemeColors.primary,
-                size: 16,
-              ),
-            ],
-          ],
-        ),
       ),
     );
   }

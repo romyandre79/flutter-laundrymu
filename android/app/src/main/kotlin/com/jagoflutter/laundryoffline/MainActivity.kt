@@ -1,4 +1,4 @@
-package com.kreatif.laundrymu
+package com.kreatif.laundry
 
 import io.flutter.embedding.android.FlutterActivity
 

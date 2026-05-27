@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
-import 'package:kreatif_laundrymu_app/core/constants/app_constants.dart';
-import 'package:kreatif_laundrymu_app/core/utils/password_helper.dart';
+import 'package:kreatif_laundry_app/core/constants/app_constants.dart';
+import 'package:kreatif_laundry_app/core/utils/password_helper.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -152,6 +152,25 @@ class DatabaseHelper {
       )
     ''');
 
+    // Create Units table
+    await db.execute('''
+      CREATE TABLE units (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // Create Logs table
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL,
+        message TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
     // Create indexes
     await _createIndexes(db);
 
@@ -227,6 +246,12 @@ class DatabaseHelper {
         'value': entry.value,
       });
     }
+
+    // Seed default units
+    final defaultUnits = ['pcs', 'kg', 'box', 'liter', 'ls', 'unit'];
+    for (final unit in defaultUnits) {
+      await db.insert('units', {'name': unit});
+    }
   }
 
   Future<void> _upgradeDB(Database db, int oldVersion, int newVersion) async {
@@ -258,6 +283,7 @@ class DatabaseHelper {
       await db.execute('ALTER TABLE orders ADD COLUMN total_discount INTEGER DEFAULT 0');
       await db.execute('ALTER TABLE order_items ADD COLUMN discount INTEGER DEFAULT 0');
     }
+    if (oldVersion < 7) {
       // Add barcode field to services
       await db.execute('ALTER TABLE services ADD COLUMN barcode TEXT');
     }
@@ -283,6 +309,36 @@ class DatabaseHelper {
       if (!cColumns.any((c) => c['name'] == 'server_id')) {
         await db.execute('ALTER TABLE customers ADD COLUMN server_id INTEGER');
       }
+    }
+    if (oldVersion < 9) {
+      // Add units table
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS units (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT UNIQUE NOT NULL,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
+
+      // Seed default units if table was just created
+      final count = Sqflite.firstIntValue(await db.rawQuery('SELECT COUNT(*) FROM units'));
+      if (count == 0) {
+        final defaultUnits = ['pcs', 'kg', 'box', 'liter', 'ls', 'unit'];
+        for (final unit in defaultUnits) {
+          await db.insert('units', {'name': unit});
+        }
+      }
+    }
+    if (oldVersion < 10) {
+      // Add logs table
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS logs (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          type TEXT NOT NULL,
+          message TEXT NOT NULL,
+          created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+      ''');
     }
   }
 

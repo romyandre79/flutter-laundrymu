@@ -1,4 +1,4 @@
-import 'package:kreatif_laundrymu_app/data/database/database_helper.dart';
+import 'package:kreatif_laundry_app/data/database/database_helper.dart';
 
 class SettingsRepository {
   final DatabaseHelper _databaseHelper;
